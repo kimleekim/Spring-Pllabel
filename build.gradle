@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+group 'org.webapp'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    providedCompile
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'org.springframework:spring-webmvc:5.1.8.RELEASE'
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.22'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.22'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+
+
+}
+
+sourceSets.main.compileClasspath += configurations.providedCompile
+sourceSets.test.compileClasspath += configurations.providedCompile
+sourceSets.test.runtimeClasspath += configurations.providedCompile
+
