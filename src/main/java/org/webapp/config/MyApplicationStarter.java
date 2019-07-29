@@ -22,6 +22,7 @@ public class MyApplicationStarter implements WebApplicationInitializer {
         AnnotationConfigWebApplicationContext context =
                 new AnnotationConfigWebApplicationContext();
         context.scan("org.webapp.config");
+        context.register(org.webapp.config.RootContextConfiguration.class);
         servletContext.addListener(new ContextLoaderListener(context));
 
         AnnotationConfigWebApplicationContext dispatcherContext =

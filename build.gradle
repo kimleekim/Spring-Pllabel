@@ -22,6 +22,9 @@ dependencies {
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.22'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.22'
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.1.8.RELEASE'
+    compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.6.0'
+    testCompile group: 'org.springframework', name: 'spring-test', version: '5.1.8.RELEASE'
 
 
 }
