@@ -11,14 +11,15 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement
 public class DataSourceContext {
-    @Bean(destroyMethod = "close")
+
+    @Bean
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/snsdb?useSSL=false&useUnicode=yes&characterEncoding=utf-8&serverTimezone=UTC");
-        dataSource.setUsername("myaccount");
+        dataSource.setUrl("jdbc:mysql://127.0.0.1:13306/snsdb?useSSL=false&useUnicode=yes&characterEncoding=utf8&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        dataSource.setUsername("account");
         dataSource.setPassword("1234");
-        dataSource.setDefaultAutoCommit(false);
+        dataSource.setDefaultAutoCommit(true);
         return dataSource;
     }
 

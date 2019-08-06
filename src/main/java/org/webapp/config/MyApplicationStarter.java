@@ -5,12 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
+import java.util.EnumSet;
 
 @Configuration
 @ComponentScan(basePackages = "org.webapp")
@@ -18,7 +19,7 @@ import javax.servlet.ServletRegistration;
 public class MyApplicationStarter implements WebApplicationInitializer {
 
     @Override
-    public void onStartup(ServletContext servletContext) {
+    public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext context =
                 new AnnotationConfigWebApplicationContext();
         context.scan("org.webapp.config");
@@ -32,5 +33,10 @@ public class MyApplicationStarter implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(context));
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
+
+        FilterRegistration charEncodingFilter = servletContext.addFilter("CharacterEncodingFilter", new CharacterEncodingFilter());
+        charEncodingFilter.setInitParameter("encoding", "utf-8");
+        charEncodingFilter.setInitParameter("forceEncoding", "true");
+        charEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
     }
 }
