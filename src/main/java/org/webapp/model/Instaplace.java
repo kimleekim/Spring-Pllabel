@@ -52,7 +52,7 @@ public class Instaplace {
     public void setHashtag(List<String> hashtag) {
         try {
             this.hashtag = gson.toJson(hashtag);
-            //db에 넣을때는 string으로 넣어야됨
+
         } catch(Exception e) {
             e.printStackTrace();
         }
