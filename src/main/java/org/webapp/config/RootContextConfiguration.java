@@ -5,9 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({
-        DataSourceContext.class
+@ComponentScan(basePackages = {
+        "org.webapp.dao",
+        "org.webapp.crawling"
 })
-@ComponentScan(basePackages = {"org.webapp.service"})
+@Import({
+        DataSourceContext.class,
+        ChromeDriverContext.class
+})
 public class RootContextConfiguration {
 }
