@@ -1,6 +1,11 @@
 # Spring-Pllabel
 Our Project Pllabel! : Spring framework-mvc: 5.1.8, Gradle, Mysql, Tomcat9, jdk1.8
 
+# row 1개(게시글 1개)의 순서
+[ station, post, date, hashtag, photo, 이미지alt ]
+
+(+) build.gradle에 compile "org.apache.commons:commons-csv:1.5" 추가하기
+
 # 서울시 지하철역 목록 (코드로 구현되어 있지만 참고용)
 가락시장
 가산디지털단지
