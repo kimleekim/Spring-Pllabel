@@ -1,7 +1,7 @@
 # Spring-Pllabel
 Our Project Pllabel! : Spring framework-mvc: 5.1.8, Gradle, Mysql, Tomcat9, jdk1.8
 
-# 서울시 지하철역 목록
+# 서울시 지하철역 목록 (코드로 구현되어 있지만 참고용)
 가락시장
 가산디지털단지
 가오리
