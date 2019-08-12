@@ -21,7 +21,7 @@ public class ChromeDriverContext {
 
     @Bean
     public WebDriver setupChromeDriver() throws Exception {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\hyeon\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "/Users/neossmac/Downloads/chromedriver");
 
         ChromeOptions options = new ChromeOptions();
         //options.addArguments("headless");
