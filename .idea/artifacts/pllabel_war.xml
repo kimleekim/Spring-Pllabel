@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="pllabel:war">
+    <output-path>$PROJECT_DIR$/out/artifacts/pllabel_war</output-path>
+    <root id="archive" name="pllabel_war.war">
+      <element id="artifact" artifact-name="pllabel:war exploded" />
+    </root>
+  </artifact>
+</component>
