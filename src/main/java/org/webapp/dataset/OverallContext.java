@@ -44,6 +44,11 @@ public class OverallContext {
         for (Map<String, String> subway : subwayList) {
             int count = 0;
             boolean isSubwayMark = false;
+
+            if (subway.get("station").equals("석수") || subway.get("station").equals("대화")
+                    || subway.get("station").equals("원흥") || subway.get("station").equals("총신대입구")) {
+                continue;
+            }
             System.out.println("-----------------------------------------------------------------");
             Thread.sleep(1500);
             searchArea = webDriver.findElement(By.name("q"));
