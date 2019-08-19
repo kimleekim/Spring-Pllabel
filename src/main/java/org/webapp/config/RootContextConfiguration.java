@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan(basePackages = {
         "org.webapp.dao",
-        "org.webapp.crawling"
+        "org.webapp.dataset"
 })
 @Import({
         DataSourceContext.class,

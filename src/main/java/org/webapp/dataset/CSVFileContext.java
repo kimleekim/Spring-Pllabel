@@ -3,23 +3,22 @@ package org.webapp.dataset;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Component
 public class CSVFileContext {
-    static List<Map<String, String>> csvInputList = new CopyOnWriteArrayList<>();
-    static List<Map<String, Integer>> headerList = new CopyOnWriteArrayList<>();
-    String fileName = "src\\stations2.csv";
-    static CSVFormat format = CSVFormat.newFormat(',').withHeader();
+    List<Map<String, String>> csvInputList = new CopyOnWriteArrayList<>();
+    List<Map<String, Integer>> headerList = new CopyOnWriteArrayList<>();
+    String fileName = "src\\station.csv";
+    CSVFormat format = CSVFormat.newFormat(',').withHeader();
 
     public List<Map<String, String>> readFile() {
         try {
