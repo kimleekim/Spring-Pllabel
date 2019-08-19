@@ -39,6 +39,7 @@ dependencies {
     compile group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev205-1.25.0'
     compile group: 'com.google.api-client', name: 'google-api-client', version: '1.25.0'
 
+
 }
 
 sourceSets.main.compileClasspath += configurations.providedCompile

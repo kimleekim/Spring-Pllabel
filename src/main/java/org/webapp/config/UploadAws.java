@@ -16,7 +16,7 @@ public class UploadAws {
 
     public static String uploadFile(String uploadPath, String originalName, byte[] byteData) throws Exception {
         AwsConnect s3 = new AwsConnect();
-        String bucketName = "pllabel";
+        String bucketName = "project-pllabel";
         //랜덤의 uid 를 만들어준다.
         UUID uid = UUID.randomUUID();
 

@@ -4,6 +4,9 @@ import com.amazonaws.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +27,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 //클라이언트 단에서 요청을 받는 컨트롤러로 UploadAws에서 정의한 메서드를 사용하는 부분이다.
+@Configuration
 
 @Controller
 public class UploadController {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(UploadController.class);
 
     AwsConnect s3 = new AwsConnect();
-    String bucketName = "pllabel";
+    String bucketName = "project-pllabel";
 
     @RequestMapping(method = RequestMethod.GET)
     public String index() {
