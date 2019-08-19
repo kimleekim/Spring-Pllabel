@@ -36,7 +36,7 @@ public class OverallDao implements Dao {
             Overall row = jdbcTemplate.queryForObject(sql, new Object[] {parameter}, new OverallMapper());
             return row;
         } catch (EmptyResultDataAccessException d) {
-            return "no such data";
+            return null;
         }
     }
 
@@ -56,6 +56,14 @@ public class OverallDao implements Dao {
 
     @Override
     public List findAll() {
-        return null;
+        try {
+            dataSource = dataSourceContext.dataSource();
+            String sql = "select * from overall";
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+            List<Overall> totlaRows = (List<Overall>) jdbcTemplate.queryForObject(sql, new OverallMapper());
+            return totlaRows;
+        } catch (EmptyResultDataAccessException d) {
+            return null;
+        }
     }
 }
