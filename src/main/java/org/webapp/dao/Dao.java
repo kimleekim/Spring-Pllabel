@@ -5,7 +5,7 @@ import java.util.List;
 public interface Dao<T> {
     void save(T model);
 
-    T findByParam(Object parameter);
+    List<T> findByParam(Object parameter);
 
     void delete(Object parameter);
 
