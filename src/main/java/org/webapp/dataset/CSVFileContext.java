@@ -12,17 +12,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
+//csv파일 원본 그대로 가져와서 열 골라쓸 수 있게 구현
+//readFile(string fileName){} 으로 구현
 @Component
 public class CSVFileContext {
     List<Map<String, String>> csvInputList = new CopyOnWriteArrayList<>();
     List<Map<String, Integer>> headerList = new CopyOnWriteArrayList<>();
-    String fileName = "src\\station.csv";
     CSVFormat format = CSVFormat.newFormat(',').withHeader();
 
-    public List<Map<String, String>> readFile() {
+    public List<Map<String, String>> readFile(String url) {
         try {
-            BufferedReader inputReader = new BufferedReader(new FileReader(new File(fileName)));
+            BufferedReader inputReader = new BufferedReader(new FileReader(new File(url)));
             CSVParser dataCSVParser = new CSVParser(inputReader, format);
             List<CSVRecord> csvRecords = dataCSVParser.getRecords();
             Map<String, Integer> headerMap = dataCSVParser.getHeaderMap();
