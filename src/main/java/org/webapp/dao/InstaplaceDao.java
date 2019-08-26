@@ -1,28 +1,67 @@
 package org.webapp.dao;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.webapp.config.DataSourceContext;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 import org.webapp.model.Instaplace;
-
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.*;
 
-public class InstaplaceDao {
+
+@Repository
+public class InstaplaceDao extends Dao<Instaplace>{
     private DataSource dataSource;
-    private DataSourceContext dataSourceContext = new DataSourceContext();
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert jdbcInsert;
+    private String sql;
+    private List<Instaplace> instaplaceList;
 
-    public void insertInstaplace (List<Object> row) throws Exception {
-        dataSource = dataSourceContext.dataSource();
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String sql = "insert into instaplace(station, post, date, hashtag) values (?, ?, ?, ?)";
+    @Autowired
+    public InstaplaceDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("instaplace")
+                                                    .usingGeneratedKeyColumns("key");
+    }
 
-        jdbcTemplate.update(sql, (String)row.get(0), (String)row.get(1), simpleDateFormat.parse((String) row.get(2)), gson.toJson(row.get(3)));
+    public InstaplaceDao() {}
+
+    @Override
+    public void save(Instaplace instaplace) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("station", instaplace.getStation());
+        parameters.put("post", instaplace.getPost());
+        parameters.put("likeCNT", instaplace.getLikeCNT());
+        parameters.put("date", instaplace.getDate());
+        parameters.put("hashtag", instaplace.getHashtag());
+        parameters.put("description", instaplace.getDescription());
+
+        jdbcInsert.execute(parameters);
+    }
+
+    @Override
+    public List<Instaplace> findByParam(Map<String, Object> parameter){
+        sql = "select * from Instaplace where ";
+        List<Instaplace> result;
+
+        result = jdbcTemplate.query(selectTarget("Instaplace", parameter, sql)
+                                                , new InstaplaceMapper());
+        return result;
+    }
+
+    @Override
+    public void delete(Map<String, Object> parameter) {
+        sql = "delete from Instaplace where ";
+        jdbcTemplate.update(selectTarget("Instaplace", parameter, sql));
+    }
+
+    @Override
+    public List<Instaplace> findAll() {
+        sql = "select * from Instaplace";
+        instaplaceList = jdbcTemplate.query(sql, new InstaplaceMapper());
+
+        return instaplaceList;
     }
 }
