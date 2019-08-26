@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan(basePackages = {
         "org.webapp.dao",
-        "org.webapp.dataset"
+        "org.webapp.dataset",
+        "org.webapp.batch",
+        "org.webapp.config"
 })
 @Import({
         DataSourceContext.class,
