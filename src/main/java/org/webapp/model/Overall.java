@@ -42,11 +42,11 @@ public class Overall {
         }
     }
 
-    public String getHashtag() {
+    public String getRestaurants() {
         return restaurants;
     }
 
-    public List<String> getHashtagOfJson() {
+    public List<String> getRestaurantsOfJson() {
         String[] tempArray = gson.fromJson(this.restaurants, String[].class);
 
         return Arrays.asList(tempArray);
