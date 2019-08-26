@@ -22,6 +22,9 @@ public class DataSourceContext {
     @Value("${datasource.pllabeldb.url}")
     private String url;
 
+    @Value("${datasource.batchjobs.url}")
+    private String quartzSchemaUrl;
+
     @Value("${datasource.pllabeldb.account}")
     private String account;
 
@@ -41,8 +44,23 @@ public class DataSourceContext {
     }
 
     @Bean
+    public DataSource dataSourceForBatchJobs() {
+        BasicDataSource batchDataSource = new BasicDataSource();
+        batchDataSource.setDriverClassName(this.driverClassName);
+        batchDataSource.setUrl(this.quartzSchemaUrl);
+        batchDataSource.setUsername(this.account);
+        batchDataSource.setPassword(this.password);
+        batchDataSource.setDefaultAutoCommit(true);
+        return batchDataSource;
+    }
+
+    @Bean
     public DataSourceTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());
+    }
+
+    @Bean DataSourceTransactionManager transactionManagerForQuartz() {
+        return new DataSourceTransactionManager(dataSourceForBatchJobs());
     }
 
 }
