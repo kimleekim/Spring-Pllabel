@@ -5,6 +5,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.webapp.config.DataSourceContext;
+import org.webapp.model.Instahot;
+import org.webapp.model.Instaranking;
 import org.webapp.model.Overall;
 
 import javax.sql.DataSource;
@@ -15,58 +17,47 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
-public class OverallDao implements Dao {
+public class OverallDao extends Dao<Overall> {
     private DataSource dataSource;
+    private JdbcTemplate jdbcTemplate;
+    private String sql;
+    private List<Overall> overallList;
 
     @Autowired
-    OverallDao(DataSource dataSource) {
+    public OverallDao(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     OverallDao() {
     }
 
     @Override
-    public void save(Object model) {    //model = station명
+    public void save(Overall station) {    //model = station명
         try {
-            String sql = "insert into overall2 values (?, \'[]\', 0, 0, 0)";
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            jdbcTemplate.update(sql, model);
+            String sql = "insert into overall values (?, \'[]\', 0, 0, 0)";
+            jdbcTemplate.update(sql, station);
         } catch (Exception e) {
-            System.out.println("overall save fail!");
             e.printStackTrace();
         }
     }
 
     @Override
-    public List<Object> findByParam(Object parameter) {   //parameter = station명
-        try {
-            String sql = "select * from overall where station = ?";
-            List<Object> returnList = new ArrayList<>();
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            returnList.add(jdbcTemplate.queryForObject(sql, new Object[] {parameter},
-                    new OverallMapper()));
-            return returnList;
-        } catch (Exception e) {
-            System.out.println("overall find fail!");
-            e.printStackTrace();
-            return null;
-        }
+    public List<Overall> findByParam(Map<String, Object> parameter){
+        sql = "select * from Overall where ";
+        List<Overall> result;
+
+        result = jdbcTemplate.query(selectTarget("Overall", parameter, sql)
+                , new OverallMapper());
+        return result;
     }
 
     @Override
-    public void delete(Object parameter) {  //parameter = station명
-        try {
-            String sql = "delete from overall where station = ?";
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            jdbcTemplate.update(sql, parameter);
-        } catch (Exception e) {
-            System.out.println("overall delete fail!");
-            e.printStackTrace();
-        }
+    public void delete(Map<String, Object> parameter) {
+        sql = "delete from Overall where ";
+        jdbcTemplate.update(selectTarget("Overall", parameter, sql));
     }
 
-    @Override
     public void update(Object model) {  //model = 사이즈2인 Map ===> Map[0] = <바꿀column, udpate할 값>, Map[1] = <"stationName", station명>
         try {
             Map<Object, Object> overall = (Map<Object, Object>) model;
@@ -117,16 +108,10 @@ public class OverallDao implements Dao {
     }
 
     @Override
-    public List findAll() {
-        try {
-            String sql = "select * from overall";
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            List<Overall> totlaRows = jdbcTemplate.query(sql, new OverallMapper());
-            return totlaRows;
-        } catch (Exception e) {
-            System.out.println("overall findAll fail!");
-            e.printStackTrace();
-            return null;
-        }
+    public List<Overall> findAll() {
+        sql = "select * from Overall";
+        overallList = jdbcTemplate.query(sql, new OverallMapper());
+
+        return overallList;
     }
 }
