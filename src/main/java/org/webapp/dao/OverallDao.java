@@ -1,20 +1,12 @@
 package org.webapp.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.webapp.config.DataSourceContext;
-import org.webapp.model.Instahot;
-import org.webapp.model.Instaranking;
 import org.webapp.model.Overall;
-
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
+
 
 @Repository
 public class OverallDao extends Dao<Overall> {
@@ -33,10 +25,10 @@ public class OverallDao extends Dao<Overall> {
     }
 
     @Override
-    public void save(Overall station) {    //model = station명
+    public void save(Overall overall) {
         try {
             String sql = "insert into overall values (?, \'[]\', 0, 0, 0)";
-            jdbcTemplate.update(sql, station);
+            jdbcTemplate.update(sql, overall.getStation());
         } catch (Exception e) {
             e.printStackTrace();
         }
