@@ -11,22 +11,31 @@ public class Instaplace {
     private long key;
     private String station;
     private String post;
+    private long likeCNT;
     private Date date;
     private String hashtag;
+    private String description;
 
     private final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public Instaplace(long key, String station, String post, Date date) {
+    public Instaplace(long key, String station, String post, long likeCNT, Date date, String hashtag, String description) {
         this.key = key;
         this.station = station;
         this.post = post;
+        this.likeCNT = likeCNT;
         this.date = date;
+        this.hashtag = hashtag;
+        this.description = description;
     }
 
     public Instaplace() {}
 
     public long getKey() {
         return key;
+    }
+
+    public void setStation(String station) {
+        this.station = station;
     }
 
     public String getStation() {
@@ -41,6 +50,14 @@ public class Instaplace {
         return post;
     }
 
+    public void setLikeCNT(long likeCNT) {
+        this.likeCNT = likeCNT;
+    }
+
+    public long getLikeCNT() {
+        return likeCNT;
+    }
+
     public void setDate(Date date) {
         this.date = date;
     }
@@ -52,7 +69,7 @@ public class Instaplace {
     public void setHashtag(List<String> hashtag) {
         try {
             this.hashtag = gson.toJson(hashtag);
-
+            //db에 넣을때는 string으로 넣어야됨
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -67,5 +84,13 @@ public class Instaplace {
         List<String> toJavaObject = Arrays.asList(tempArray);
 
         return toJavaObject;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
