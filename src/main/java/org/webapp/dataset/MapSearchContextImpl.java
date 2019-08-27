@@ -34,6 +34,7 @@ public class MapSearchContextImpl implements MapSerachContext {
     }
 
     public void getStationList () throws Exception {
+        Overall overall = new Overall();
         this.webDriver = chromeDriverContext.setupChromeDriver();
         webDriver.get(url);
         for (Map<String, String> subway : subwayList) {
@@ -52,7 +53,8 @@ public class MapSearchContextImpl implements MapSerachContext {
                         if (station.findElement(By.xpath(".//div[3]/strong/a[2]")).getAttribute("title").contains(subway.get("station"))) {
                             if (station.findElement(By.xpath(".//div[5]/div[2]/p[1]")).getText().contains("서울")) {
                                 System.out.println("추가될 지하철역 : " + subway.get("station"));
-                                overallDao.save(subway.get("station"));
+                                overall.setStation(subway.get("station"));
+                                overallDao.save(overall);
                             }
                             break;
                         }
