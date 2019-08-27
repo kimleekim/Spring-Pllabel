@@ -58,22 +58,5 @@ public class MainApplicationTest {
 
     }
 
-    @Test
-    @Rollback(false)
-    public void hashtagJsonTest() {
-        Instaplace instaplace = new Instaplace(2, "영등포", "테스트합니다", java.sql.Date.valueOf(now()));
-        ArrayList<String> testarray = new ArrayList<>();
-        testarray.add(new String("#daily"));
-        testarray.add(new String("#일상"));
-        testarray.add(new String("#맞팔"));
-        testarray.add(new String("#ootd"));
-        testarray.add(new String("#고씨네는_완전_쫀맛탱이당"));
-        instaplace.setHashtag(testarray);
-
-        String sql2 = "insert into instaplace values(?,?,?,?,?)";
-
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.update(sql2, instaplace.getKey(), instaplace.getStation(), instaplace.getPost(), instaplace.getDate(), instaplace.getHashtag());
-
-    }
+        
 }
