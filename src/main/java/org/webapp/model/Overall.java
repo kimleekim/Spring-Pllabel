@@ -3,6 +3,7 @@ package org.webapp.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,8 +17,9 @@ public class Overall {
 
     private final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public Overall(String station, int instaCNT, int youtubeCNT, long likeCNT) {
+    public Overall(String station, String restaurants, int instaCNT, int youtubeCNT, long likeCNT) {
         this.station = station;
+        this.restaurants = restaurants;
         this.instaCNT = instaCNT;
         this.youtubeCNT = youtubeCNT;
         this.likeCNT = likeCNT;
@@ -36,7 +38,6 @@ public class Overall {
     public void setRestaurants(List<String> restaurants) {
         try {
             this.restaurants = gson.toJson(restaurants);
-            //db에 넣을때는 string으로 넣어야됨
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -47,9 +48,15 @@ public class Overall {
     }
 
     public List<String> getRestaurantsOfJson() {
-        String[] tempArray = gson.fromJson(this.restaurants, String[].class);
+        String trimmedJson;
+        trimmedJson = this.restaurants.substring(5, restaurants.length()-3)
+                .replace("\\", "")
+                .replace("\"\"", "\"");
 
-        return Arrays.asList(tempArray);
+        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
+        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+
+        return toJavaObject;
     }
 
     public void setInstaCNT(int instaCNT) {

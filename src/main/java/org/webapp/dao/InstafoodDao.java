@@ -26,13 +26,14 @@ public class InstafoodDao extends Dao<Instafood> {
     @Override
     public void save(Instafood instafood) {
         try {
-            String sql = "insert into instafood(station, post, instafood.date, likeCNT, photoURL) values (?, ?, ?, ?, ?)";
+            String sql = "insert into instafood(station, post, instafood.date, likeCNT, myRestaurant, photoURL) values (?, ?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(sql,
                                 instafood.getStation(),
                                 instafood.getPost(),
                                 instafood.getDate(),
                                 instafood.getLikeCNT(),
+                                instafood.getMyRestaurant(),
                                 instafood.getPhotoURL());
 
         } catch (Exception e) {

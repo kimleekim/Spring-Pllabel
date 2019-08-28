@@ -1,9 +1,13 @@
 package org.webapp.model;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import org.codehaus.jettison.json.JSONArray;
+import org.openqa.selenium.json.Json;
 
+import java.lang.reflect.Type;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +20,7 @@ public class Instaplace {
     private String hashtag;
     private String description;
 
-    private final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public Instaplace(long key, String station, String post, long likeCNT, Date date, String hashtag, String description) {
         this.key = key;
@@ -69,7 +73,6 @@ public class Instaplace {
     public void setHashtag(List<String> hashtag) {
         try {
             this.hashtag = gson.toJson(hashtag);
-            //db에 넣을때는 string으로 넣어야됨
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -80,8 +83,13 @@ public class Instaplace {
     }
 
     public List<String> getHashtagOfJson() {
-        String[] tempArray = gson.fromJson(this.hashtag, String[].class);
-        List<String> toJavaObject = Arrays.asList(tempArray);
+        String trimmedJson;
+        trimmedJson = this.hashtag.substring(5, hashtag.length()-3)
+                            .replace("\\", "")
+                            .replace("\"\"", "\"");
+
+        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
+        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
 
         return toJavaObject;
     }
