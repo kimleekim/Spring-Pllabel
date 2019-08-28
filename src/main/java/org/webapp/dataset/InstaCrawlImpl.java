@@ -7,19 +7,21 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import org.webapp.config.ChromeDriverContext;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class InstaCrawlImpl implements InstaCrawl {
-
+    @Autowired
+    S3Connector s3Connector;
     private WebDriver driver;
     private ChromeDriverContext driverContext;
     private WebDriverWait webDriverWait;
     private By findWebElement;
-    private ArrayList<Object> row;
     private int skipPopularposts;
     private int space = 0;
     private String hashtag;
@@ -30,6 +32,7 @@ public class InstaCrawlImpl implements InstaCrawl {
     private String commentcheck;
     private List<WebElement> replyList;
     private String replycheck;
+    private int isFoodpost = 0;
 
     @Autowired
     public InstaCrawlImpl(ChromeDriverContext driverContext) {
@@ -37,13 +40,22 @@ public class InstaCrawlImpl implements InstaCrawl {
     }
 
     @Override
-    public WebDriver setUpWebDriver(String url) throws Exception {
+    public WebDriver setUpWebDriver(String searchKeyword, String station) throws Exception {
         this.driver = driverContext.setupChromeDriver();
         this.webDriverWait = new WebDriverWait(this.driver, 3600);
         driver.manage().window().maximize();
-        this.row = new ArrayList<>();
-        this.skipPopularposts = 9;
-        driver.get(url);
+        this.skipPopularposts = 0;
+        String search = URLEncoder.encode(searchKeyword, "UTF-8");
+        driver.get("https://www.instagram.com/explore/tags/" + search);
+
+        if (searchKeyword.contains(station)) {
+            isFoodpost = 1;
+            //이게 1이면 alt=음식 포함된 이미지 글만 크롤링 (instafood 채우기)
+        }
+        else {
+            isFoodpost = 2;
+            //이게 2이면 alt=실내/실외 포함된 이미지 글만 크롤링 (instahot 채우기)
+        }
 
         this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/article/div[1]/div/div/div[1]/div[1]/a");
         this.element = webDriverWait.until(ExpectedConditions.elementToBeClickable(this.findWebElement));
@@ -56,25 +68,203 @@ public class InstaCrawlImpl implements InstaCrawl {
             this.element.click();
         }
         // 최근 게시물에서 1번째 게시물 열린 상태로 멈춤
-
+        Thread.sleep(5000);
         return driver;
     }
 
     @Override
     public String getDate(WebDriver driver) {
         this.driver = driver;
-        this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time"));
-        String realdate = element.getAttribute("title");
-
-        return realdate; //2019년 8월 8일 같은 형태로 출력
+        String realdate = null;
+        try {
+            this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time"));
+            realdate = element.getAttribute("title");
+        } catch (Exception one_more_try) {
+            try {
+                this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time"));
+                realdate = element.getAttribute("title");
+            } catch (Exception no_date_exist) {
+                realdate = null;
+            }
+        } finally {
+            return realdate; //2019년 8월 8일 같은 형태로 출력
+        }
     }
 
     @Override
     public String getPost(WebDriver driver) {
         this.driver = driver;
-        this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
-        String post = element.getText();
-        return post;
+        String post = null;
+        try {
+            this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
+            post = element.getText();
+        } catch (Exception one_more_try) {
+            try {
+                this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
+                post = element.getText();
+            } catch (Exception no_post_exist) {
+                post = null;
+            }
+        } finally {
+            return post;
+        }
+    }
+
+    @Override
+    public long getLikeCNT(WebDriver driver) {
+        this.driver = driver;
+        long likeCNT = 0;
+        try {
+            this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[2]/div/div/button/span"));
+            likeCNT = Integer.parseInt(element.getText().replaceAll("\\,", ""));
+        } catch (Exception one_more_try) {
+            try {
+                this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[2]/div/div/button/span"));
+                likeCNT = Integer.parseInt(element.getText().replaceAll("\\,", ""));
+            } catch (Exception no_like_exist) {
+                likeCNT = 0;
+            }
+        }
+        return likeCNT;
+    }
+
+    @Override
+    public String getDescription(WebDriver driver, int index) {
+        this.driver = driver;
+        String description = null;
+        try {
+            this.element = setPhotoURLElement(driver, index);
+            if (!(element == null)) {
+                description = element.getAttribute("alt");
+            }
+        } catch (Exception one_more_try) {
+            try {
+                this.element = setPhotoURLElement(driver, index);
+                if (!(element == null)) {
+                    description = element.getAttribute("alt");
+                }
+            } catch (Exception no_desc_exist) {
+                description = null;
+            }
+        } finally {
+            return description;
+        }
+    }
+
+    @Override
+    public String getPhotopageURL(WebDriver driver) {   //게시글 화면의 url 리턴
+        this.driver = driver;
+        return driver.getCurrentUrl();
+    }
+
+    @Override
+    public String getPhotoURL(WebDriver driver, String station, String url) throws Exception {
+        String photoURL = null;
+        boolean isFirstPhoto = true;
+        int index = 1;
+        this.driver = driver;
+
+        driver.get(url);
+        Thread.sleep(1500);
+        while (true) {
+            try {
+                String description = getDescription(driver, index);
+                System.out.println(description);
+                if (isFoodpost == 1 && description != null && description.contains("음식")) {
+                    photoURL = getPhotoSRC(driver, index);
+                    break;
+                }
+                else if (isFoodpost == 2 && description != null && ((description.contains("실내") || description.contains("실외")))) {
+                    photoURL = getPhotoSRC(driver, index);
+                    break;
+                }
+                if (isFirstPhoto) {
+                    driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button")).click();
+                    isFirstPhoto = false;
+                }
+                else {
+                    driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button[2]")).click();
+                }
+                index++;
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                break;
+            }
+        }
+        if (!(photoURL == null)) {
+            MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, station);
+            return s3Connector.upload(multipartFile, "static");
+        }
+        else {
+            return null;
+        }
+    }
+
+    private WebElement setPhotoURLElement(WebDriver driver, int index) {
+        //getDescription, getPhotoURL에서 포스팅 사진 태그를 읽어들이기 위한 공통적인 사전작업
+        this.driver = driver;
+        try {
+            driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button"));
+            try {
+                if (index == 1) {
+                    try {
+                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li[1]/div/div/div/div[1]/img"));
+                    } catch (Exception have_friend_tag) {
+                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li[1]/div/div/div/div[1]/div[1]/img"));
+                    }
+                }
+                else {
+                    try {
+                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
+                                + index + "]/div/div/div/div/div[1]/img"));
+                    } catch (Exception have_friend_tag) {
+                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
+                                + index + "]/div/div/div/div/div[1]/div[1]/img"));
+                    }
+                }
+            } catch (Exception have_friend_tag) {
+                try {
+                    this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
+                            + index + "]/div/div/div/div/div[1]/div[1]/img"));
+                } catch (Exception no_image_exist) {
+                    this.element = null;
+                }
+            }
+        } catch (Exception post_has_one_photo) {
+            try {
+                this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div[1]/img"));
+            } catch (Exception have_friend_tag) {
+                try {
+                    this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div[1]/div[1]/img"));
+                } catch (Exception no_image_exist) {
+                    this.element = null;
+                }
+            }
+        }
+        return element;
+    }
+
+    private String getPhotoSRC (WebDriver driver, int index) {
+        //aws에 저장할 포스팅 사진의 src값 얻어오는 작업
+        this.driver = driver;
+        String photoSRC = null;
+        try {
+            this.element = setPhotoURLElement(driver, index);
+            if (!(element == null)) {
+                photoSRC = element.getAttribute("srcset");
+            }
+        } catch (Exception one_more_try) {
+            try {
+                this.element = setPhotoURLElement(driver, index);
+                if (!(element == null)) {
+                    photoSRC = element.getAttribute("srcset");
+                }
+            } catch (Exception no_src_exist) {
+                photoSRC = null;
+            }
+        } finally {
+            return photoSRC;
+        }
     }
 
     @Override
@@ -98,7 +288,6 @@ public class InstaCrawlImpl implements InstaCrawl {
                 break;
             }
         }
-
         try {
             commentList = driver.findElements(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/ul"));
 
@@ -150,8 +339,8 @@ public class InstaCrawlImpl implements InstaCrawl {
     private List<String> findHashtags(String content, List<String> hashtags) {
         String temp = content;
 
-        for(int character=0; character<temp.length(); character++) {
-            if(temp.charAt(character) == '#') {
+        for (int character=0; character<temp.length(); character++) {
+            if (temp.charAt(character) == '#') {
                 temp = temp.substring(character);
                 character = 0;
 
@@ -186,5 +375,21 @@ public class InstaCrawlImpl implements InstaCrawl {
         minimum = (minimum < newTag) ? minimum : newTag;
 
         return minimum;
+    }
+
+    @Override
+    public boolean clickNextButton(WebDriver driver) {
+        this.driver = driver;
+        boolean doesNextExist = true;
+        try {
+            driver.findElement(By.cssSelector("body > div._2dDPU.vCf6V > div.EfHg9 > div > div > a.HBoOv.coreSpriteRightPaginationArrow")).click();
+            doesNextExist = true;
+            Thread.sleep(1500);
+        } catch (Exception reach_last_post) {
+            doesNextExist = false;
+            driver.findElement(By.xpath("/html/body/div[4]/button[1]")).click();
+            //새로운 검색어 넣는 작업 필요 (리턴값이 false면)
+        }
+        return doesNextExist;
     }
 }
