@@ -46,6 +46,7 @@ dependencies {
     compile group: 'org.springframework.batch', name: 'spring-batch-core', version: '4.1.2.RELEASE'
     compile group: 'org.springframework.batch', name: 'spring-batch-infrastructure', version: '4.1.2.RELEASE'
     testCompile group: 'org.springframework.batch', name: 'spring-batch-test', version: '4.1.2.RELEASE'
+    compile group: 'org.springframework', name: 'spring-mock', version: '2.0.8'
 
 }
 
