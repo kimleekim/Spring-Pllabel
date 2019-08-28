@@ -40,15 +40,15 @@ public class InstaCrawlImpl implements InstaCrawl {
     }
 
     @Override
-    public WebDriver setUpWebDriver(String searchKeyword, String station) throws Exception {
+    public WebDriver setUpWebDriver(String search, String station) throws Exception {
         this.driver = driverContext.setupChromeDriver();
         this.webDriverWait = new WebDriverWait(this.driver, 3600);
         driver.manage().window().maximize();
-        this.skipPopularposts = 0;
-        String search = URLEncoder.encode(searchKeyword, "UTF-8");
-        driver.get("https://www.instagram.com/explore/tags/" + search);
+        this.skipPopularposts = 9;
+        //String search = URLEncoder.encode(searchKeyword, "UTF-8");
+        driver.get(search);
 
-        if (searchKeyword.contains(station)) {
+        if (search.contains(station)) {
             isFoodpost = 1;
             //이게 1이면 alt=음식 포함된 이미지 글만 크롤링 (instafood 채우기)
         }
@@ -68,7 +68,7 @@ public class InstaCrawlImpl implements InstaCrawl {
             this.element.click();
         }
         // 최근 게시물에서 1번째 게시물 열린 상태로 멈춤
-        Thread.sleep(5000);
+        Thread.sleep(1000);
         return driver;
     }
 
