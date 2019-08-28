@@ -50,34 +50,53 @@ public class OverallDao extends Dao<Overall> {
         jdbcTemplate.update(selectTarget("Overall", parameter, sql));
     }
 
-    public void update(Map<Object, String> parameter, int conditionPosition) {
-//        conditionPosition = n번째 데이터부터가 set절에 대한 조건이다 라는 표시 (1번째 데이터 = index 0인 데이터 인 것 주의)
-        List<Map<String, Object>> parameters = separateParameter(parameter, conditionPosition);
-        sql = "update overall set ";
-        sql = selectTarget("Overall", parameters.get(0), sql);
-        sql += " where ";
-        jdbcTemplate.update(selectTarget("Overall", parameters.get(1), sql));
-    }
+    public void update(Object model) {  //model = 사이즈2인 Map ===> Map[0] = <바꿀column, udpate할 값>, Map[1] = <"stationName", station명>
+        try {
+            Map<Object, Object> overall = (Map<Object, Object>) model;
+            Set<Object> keySet = overall.keySet();
+            Iterator key = keySet.iterator();
+            String sql = "";
+            String column = "";
+            Overall overallObject = null;
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-    private List<Map<String, Object>> separateParameter (Map<Object, String> parameter, int conditionPosition) {
-        List<Map<String, Object>> parameters = new ArrayList<>();
-        Map<String, Object> setParameter = new HashMap<>();
-        Map<String, Object> whereParameter = new HashMap<>();
-        Set<Object> keySet = parameter.keySet();
-        Iterator<Object> keys = keySet.iterator();
-
-        for (int i = 0; i < parameter.size(); i++) {
-            Object key = keys.next();
-            if (i < conditionPosition - 1) {
-                whereParameter.put(parameter.get(key), key);
+            if (overall.containsKey("station")) {
+                column = "station";
+                sql = "update overall set station = ? where station = ?";
             }
-            else {
-                setParameter.put(parameter.get(key), key);
+            else if (overall.containsKey("restaurants")) {
+                column = "restaurants";
+                List<String> restaurants = (List<String>) overall.get("restaurants");
+                System.out.println(restaurants);
+                overallObject = new Overall();
+                overallObject.setRestaurants(restaurants);
+                sql = "update overall set restaurants = ? where station = ?";
             }
+            else if (overall.containsKey("instaCNT")) {
+                column = "instaCNT";
+                sql = "update overall set instaCNT = ? where station = ?";
+            }
+            else if (overall.containsKey("youtubeCNT")) {
+                column = "youtubeCNT";
+                sql = "update overall set youtubeCNT = ? where station = ?";
+            }
+            else if (overall.containsKey("likeCNT")) {
+                column = "likeCNT";
+                sql = "update overall set likeCNT = ? where station = ?";
+            }
+            if (key.hasNext()) {
+                if (overall.containsKey("restaurants")) {
+                    jdbcTemplate.update(sql, overallObject.getRestaurants(), overall.get("stationName"));
+                }
+                else {
+                    jdbcTemplate.update(sql, overall.get(column), overall.get("stationName"));
+                }
+            }
+            overall.clear();
+        } catch (Exception e) {
+            System.out.println("overall update fail!");
+            e.printStackTrace();
         }
-        parameters.add(setParameter);
-        parameters.add(whereParameter);
-        return parameters;
     }
 
     @Override

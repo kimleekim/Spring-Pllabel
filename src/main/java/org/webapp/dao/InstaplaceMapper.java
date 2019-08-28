@@ -17,7 +17,6 @@ public class InstaplaceMapper implements RowMapper<Instaplace> {
                                             rs.getDate("date"),
                                             rs.getString("hashtag"),
                                             rs.getString("description"));
-                                            rs.getLong("likeCNT");
 
         return instaplace;
 

@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,12 +19,13 @@ public class Instafood {
 
     private final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public Instafood (long key, String station, String post, Date date, long likeCNT, String photoURL) {
+    public Instafood (long key, String station, String post, Date date, long likeCNT, String myRestaurant, String photoURL) {
         this.key = key;
         this.station = station;
         this.post = post;
         this.date = date;
         this.likeCNT = likeCNT;
+        this.myRestaurant = myRestaurant;
         this.photoURL = photoURL;
     }
 
@@ -73,7 +75,6 @@ public class Instafood {
     public void setMyRestaurant(List<String> myRestaurants) {
         try {
             this.myRestaurant = gson.toJson(myRestaurants);
-            //db에 넣을때는 string으로 넣어야됨
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -84,8 +85,13 @@ public class Instafood {
     }
 
     public List<String> getMyRestaurantOfJson() {
-        String[] tempArray = gson.fromJson(this.myRestaurant, String[].class);
-        List<String> toJavaObject = Arrays.asList(tempArray);
+        String trimmedJson;
+        trimmedJson = this.myRestaurant.substring(5, myRestaurant.length()-3)
+                .replace("\\", "")
+                .replace("\"\"", "\"");
+
+        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
+        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
 
         return toJavaObject;
     }
