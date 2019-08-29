@@ -40,7 +40,6 @@ public class S3Connector {
         String fileName = dirName + "/" + uploadFile.getName();
         String uploadImageUrl = putS3(uploadFile, fileName);
         System.out.println(uploadImageUrl);
-        removeNewFile(uploadFile);
         return uploadImageUrl;
     }
 
@@ -51,17 +50,6 @@ public class S3Connector {
             error.printStackTrace();
         }
         return amazonS3Client.getUrl(bucket, fileName).toString();
-    }
-
-    public void removeNewFile(File targetFile) {
-        targetFile = new File("C:\\Users\\1229k\\Documents\\Spring-Pllabel\\"+targetFile.getPath());
-        if (targetFile.exists()) {
-            if (targetFile.delete()) {
-                System.out.println("edcba파일이 삭제되었습니다.");
-            } else {
-                System.out.println("abcde파일이 삭제되지 못했습니다.");
-            }
-        }
     }
 
     public MultipartFile convertFileDatatype(int isInsta, String photoURL, String station) throws IOException {
