@@ -1,6 +1,9 @@
 package org.webapp.dataset;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.webapp.config.ChromeDriverContext;
@@ -10,6 +13,7 @@ import org.webapp.model.Overall;
 import javax.sql.DataSource;
 import java.util.*;
 
+
 @Component
 public class MapSearchContextImpl implements MapSerachContext {
     @Autowired
@@ -17,6 +21,7 @@ public class MapSearchContextImpl implements MapSerachContext {
     private ChromeDriverContext chromeDriverContext;
     private List<Map<String, String>> subwayList;
     private WebDriver webDriver;
+    private WebDriverWait webDriverWait;
     private CSVFileContext csvFileContext;
     private String url = "https://map.kakao.com/";
 
@@ -70,18 +75,46 @@ public class MapSearchContextImpl implements MapSerachContext {
     public List<String> getRestaurantList(String station) throws Exception {
         int totalCount = 1;
         boolean isFifth = false;
+        String checkWebLoad;
+        boolean isWebLoad = false;
         List<String> insertRestaurantList = new ArrayList<>();
 
         this.webDriver = chromeDriverContext.setupChromeDriver();
+        this.webDriverWait = new WebDriverWait(this.webDriver, 20);
+
         webDriver.get(url);
         WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
-        searchArea.sendKeys(station + "역 맛집");
-        searchArea.sendKeys(Keys.ENTER);
-        Thread.sleep(1500);
+        searchArea.sendKeys(station + "역 음식점");
+
+        while(!isWebLoad) {
+            System.out.println(111111);
+            searchArea.sendKeys(Keys.ENTER);
+            try {
+                try {
+                    webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
+                } catch(TimeoutException e) {
+                    continue;
+                }
+                System.out.println(333);
+                checkWebLoad = webDriver.findElement(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")).getText();
+                if(checkWebLoad.contains(station + "역"))
+                    isWebLoad = true;
+                else {
+                    searchArea.clear();
+                    searchArea.sendKeys(station + "역 음식점");
+                }
+            } catch (NoSuchElementException e) {
+                searchArea.clear();
+                searchArea.sendKeys(station + "역 음식점");
+                continue;
+            }
+        }
+        System.out.println(44444);
 
         while (true) {
+            System.out.println("페이지 넘어갔다.");
             List<WebElement> restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
-            //검색목록 n번째 페이지의 for문
+
             for (WebElement restaurant : restaurantList) {
                 try {
                     if (restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("커피전문점") ||
@@ -129,7 +162,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                     }
                 }
             }
-            Thread.sleep(1500);
+            webDriverWait.until(webDriver1 ->  ((JavascriptExecutor)webDriver1).executeScript("return document.readyState").equals("complete"));
             totalCount++;
         }
         return insertRestaurantList;
