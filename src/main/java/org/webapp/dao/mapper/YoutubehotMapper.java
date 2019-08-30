@@ -1,4 +1,4 @@
-package org.webapp.dao;
+package org.webapp.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.webapp.model.Youtubehot;
@@ -14,6 +14,8 @@ public class YoutubehotMapper implements RowMapper<Youtubehot> {
         youtubehot.setKey(rs.getInt("key"));
         youtubehot.setStation(rs.getString("station"));
         youtubehot.setTitle(rs.getString("title"));
+        youtubehot.setContent(rs.getString("content"));
+        youtubehot.setTotalview(rs.getLong("totalview"));
         youtubehot.setCreator(rs.getString("creator"));
         youtubehot.setDate(rs.getDate("date"));
         youtubehot.setThumbnailURL(rs.getString("thumbnailURL"));

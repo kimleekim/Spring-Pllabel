@@ -1,4 +1,4 @@
-package org.webapp.dao;
+package org.webapp.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.webapp.model.Youtubefood;
@@ -14,6 +14,8 @@ public class YoutubefoodMapper implements RowMapper<Youtubefood> {
         youtubefood.setKey(rs.getInt("key"));
         youtubefood.setStation(rs.getString("station"));
         youtubefood.setTitle(rs.getString("title"));
+        youtubefood.setContent(rs.getString("content"));
+        youtubefood.setTotalview(rs.getLong("totalview"));
         youtubefood.setCreator(rs.getString("creator"));
         youtubefood.setDate(rs.getDate("date"));
         youtubefood.setThumbnailURL(rs.getString("thumbnailURL"));
