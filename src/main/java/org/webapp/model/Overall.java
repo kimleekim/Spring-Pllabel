@@ -2,6 +2,7 @@ package org.webapp.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,15 +49,30 @@ public class Overall {
     }
 
     public List<String> getRestaurantsOfJson() {
-        String trimmedJson;
-        trimmedJson = this.restaurants.substring(5, restaurants.length()-3)
-                .replace("\\", "")
-                .replace("\"\"", "\"");
+        String[] tempArray;
+        List<String> toJavaObject;
 
-        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
-        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+        try {
+            String trimmedJson;
+            trimmedJson = this.restaurants.substring(5, restaurants.length() - 3)
+                    .replace("\\", "")
+                    .replace("\"\"", "\"");
 
-        return toJavaObject;
+            System.out.println("다듬어진 스트링 : " + trimmedJson);
+            tempArray = gson.fromJson(trimmedJson, String[].class);
+            toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+
+        } catch(StringIndexOutOfBoundsException
+                | IllegalStateException
+                | JsonSyntaxException e) {
+
+            tempArray = gson.fromJson(getRestaurants(), String[].class);
+            toJavaObject = new ArrayList<>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+        }
     }
 
     public void setInstaCNT(int instaCNT) {
