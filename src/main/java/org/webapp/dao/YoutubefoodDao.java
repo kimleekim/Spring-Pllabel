@@ -3,6 +3,7 @@ package org.webapp.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.webapp.dao.mapper.YoutubefoodMapper;
 import org.webapp.model.Youtubefood;
 
 import javax.sql.DataSource;
@@ -22,15 +23,17 @@ public class YoutubefoodDao extends Dao<Youtubefood> {
     }
 
     public YoutubefoodDao() {}
-    
+
     @Override
     public void save(Youtubefood youtubefood) {
         try {
-            String sql = "insert into youtubefood(station, title, creator, youtubefood.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?)";
+            String sql = "insert into youtubefood(station, title, content, totalview, creator, youtubefood.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(sql,
                     youtubefood.getStation(),
                     youtubefood.getTitle(),
+                    youtubefood.getContent(),
+                    youtubefood.getTotalview(),
                     youtubefood.getCreator(),
                     youtubefood.getDate(),
                     youtubefood.getThumbnailURL(),

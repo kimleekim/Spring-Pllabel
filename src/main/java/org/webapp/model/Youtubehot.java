@@ -6,15 +6,19 @@ public class Youtubehot {
     private long key;
     private String station;
     private String title;
+    private String content;
+    private long totalview;
     private String creator;
     private Date date;
     private String thumbnailURL;
     private String videoLink;
 
-    public Youtubehot (long key, String station, String title, String creator, Date date, String thumbnailURL, String videoLink) {
+    public Youtubehot (long key, String station, String title, String content, long totalview, String creator, Date date, String thumbnailURL, String videoLink) {
         this.key = key;
         this.station = station;
         this.title = title;
+        this.content = content;
+        this.totalview = totalview;
         this.creator = creator;
         this.date = date;
         this.thumbnailURL = thumbnailURL;
@@ -48,6 +52,14 @@ public class Youtubehot {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getContent() { return content; }
+
+    public void setContent(String content) { this.content = content; }
+
+    public long getTotalview() { return totalview; }
+
+    public void setTotalview(long totalview) { this.totalview = totalview; }
 
     public String getCreator() {
         return creator;

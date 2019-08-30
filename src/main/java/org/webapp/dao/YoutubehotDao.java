@@ -3,6 +3,7 @@ package org.webapp.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.webapp.dao.mapper.YoutubehotMapper;
 import org.webapp.model.Youtubehot;
 
 import javax.sql.DataSource;
@@ -26,11 +27,13 @@ public class YoutubehotDao extends Dao<Youtubehot> {
     @Override
     public void save(Youtubehot youtubehot) {
         try {
-            String sql = "insert into youtubehot(station, title, creator, youtubehot.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?)";
+            String sql = "insert into youtubehot(station, title, content, totalview, creator, youtubehot.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(sql,
                     youtubehot.getStation(),
                     youtubehot.getTitle(),
+                    youtubehot.getContent(),
+                    youtubehot.getTotalview(),
                     youtubehot.getCreator(),
                     youtubehot.getDate(),
                     youtubehot.getThumbnailURL(),
