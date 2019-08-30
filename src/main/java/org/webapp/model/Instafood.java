@@ -1,6 +1,7 @@
 package org.webapp.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -85,15 +86,29 @@ public class Instafood {
     }
 
     public List<String> getMyRestaurantOfJson() {
-        String trimmedJson;
-        trimmedJson = this.myRestaurant.substring(5, myRestaurant.length()-3)
-                .replace("\\", "")
-                .replace("\"\"", "\"");
+        String[] tempArray;
+        List<String> toJavaObject;
 
-        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
-        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+        try {
+            String trimmedJson;
+            trimmedJson = this.myRestaurant.substring(5, myRestaurant.length() - 3)
+                    .replace("\\", "")
+                    .replace("\"\"", "\"");
 
-        return toJavaObject;
+            tempArray = gson.fromJson(trimmedJson, String[].class);
+            toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+
+        } catch(StringIndexOutOfBoundsException
+                | IllegalStateException
+                | JsonSyntaxException e) {
+
+            tempArray = gson.fromJson(getMyRestaurant(), String[].class);
+            toJavaObject = new ArrayList<>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+        }
     }
 
     public String getPhotoURL() {

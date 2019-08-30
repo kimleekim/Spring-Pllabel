@@ -83,15 +83,29 @@ public class Instaplace {
     }
 
     public List<String> getHashtagOfJson() {
-        String trimmedJson;
-        trimmedJson = this.hashtag.substring(5, hashtag.length()-3)
-                            .replace("\\", "")
-                            .replace("\"\"", "\"");
+        String[] tempArray;
+        List<String> toJavaObject;
 
-        String[] tempArray = gson.fromJson(trimmedJson, String[].class);
-        List<String> toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+        try {
+            String trimmedJson;
+            trimmedJson = this.hashtag.substring(5, hashtag.length() - 3)
+                    .replace("\\", "")
+                    .replace("\"\"", "\"");
 
-        return toJavaObject;
+            tempArray = gson.fromJson(trimmedJson, String[].class);
+            toJavaObject = new ArrayList<String>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+
+        } catch(StringIndexOutOfBoundsException
+                | IllegalStateException
+                | JsonSyntaxException e) {
+
+            tempArray = gson.fromJson(getHashtag(), String[].class);
+            toJavaObject = new ArrayList<>(Arrays.asList(tempArray));
+
+            return toJavaObject;
+        }
     }
 
     public void setDescription(String description) {
