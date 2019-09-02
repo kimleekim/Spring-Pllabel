@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.webapp.config.ChromeDriverContext;
 import org.webapp.dao.OverallDao;
 import org.webapp.model.Overall;
@@ -75,7 +76,7 @@ public class MapSearchContextImpl implements MapSerachContext {
     public List<String> getRestaurantList(String station) throws Exception {
         int totalCount = 1;
         boolean isFifth = false;
-        String checkWebLoad;
+        String checkWebLoad = null;
         boolean isWebLoad = false;
         List<String> insertRestaurantList = new ArrayList<>();
 
@@ -84,11 +85,13 @@ public class MapSearchContextImpl implements MapSerachContext {
 
         webDriver.get(url);
         WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
+        searchArea.clear();
         searchArea.sendKeys(station + "역 음식점");
 
         while(!isWebLoad) {
             System.out.println(111111);
             searchArea.sendKeys(Keys.ENTER);
+            searchArea.clear();
             try {
                 try {
                     webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
@@ -96,9 +99,15 @@ public class MapSearchContextImpl implements MapSerachContext {
                     continue;
                 }
                 System.out.println(333);
-                checkWebLoad = webDriver.findElement(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")).getText();
-                if(checkWebLoad.contains(station + "역"))
+                try {
+                    checkWebLoad = webDriver.findElement(By.id("search.keyword.query")).getAttribute("value");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                int count = StringUtils.countOccurrencesOf(checkWebLoad, station + "역");
+                if (count == 1) {
                     isWebLoad = true;
+                }
                 else {
                     searchArea.clear();
                     searchArea.sendKeys(station + "역 음식점");
@@ -110,15 +119,16 @@ public class MapSearchContextImpl implements MapSerachContext {
             }
         }
         System.out.println(44444);
-
         while (true) {
             System.out.println("페이지 넘어갔다.");
             List<WebElement> restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
 
             for (WebElement restaurant : restaurantList) {
                 try {
-                    if (restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("커피전문점") ||
-                            restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("카페")) {
+                    if (restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("전문점") ||
+                            restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("카페") ||
+                            restaurant.findElement(By.xpath(".//div[3]/span")).getText().contains("패스트푸드"))
+                    {
                         continue;
                     }
                     else {
@@ -149,7 +159,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                 else if (totalCount % 5 == 0) {
                     try {
                         isFifth = true;
-                        webDriver.findElement(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + totalCount + "]")).sendKeys(Keys.ENTER);
+                        webDriver.findElement(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + 5 + "]")).sendKeys(Keys.ENTER);
                     } catch (Exception e) {
                         break;
                     }
@@ -162,8 +172,10 @@ public class MapSearchContextImpl implements MapSerachContext {
                     }
                 }
             }
-            webDriverWait.until(webDriver1 ->  ((JavascriptExecutor)webDriver1).executeScript("return document.readyState").equals("complete"));
             totalCount++;
+            Thread.sleep(1000);
+//            webDriverWait.until(webDriver1 ->  ((JavascriptExecutor)webDriver1).executeScript("return document.readyState").equals("complete"));
+            searchArea.clear();
         }
         return insertRestaurantList;
     }

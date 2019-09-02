@@ -4,10 +4,10 @@ public class Instaranking {
     private long key;
     private String station;
     private String placetag;
-    private int placetagCNT;
-    private int likeCNT;
+    private long placetagCNT;
+    private long likeCNT;
 
-    public Instaranking (long key, String station, String placetag, int placetagCNT, int likeCNT) {
+    public Instaranking (long key, String station, String placetag, long placetagCNT, long likeCNT) {
         this.key = key;
         this.station = station;
         this.placetag = placetag;
@@ -30,11 +30,11 @@ public class Instaranking {
         return placetag;
     }
 
-    public int getPlacetagCNT() {
+    public long getPlacetagCNT() {
         return placetagCNT;
     }
 
-    public int getLikeCNT() {
+    public long getLikeCNT() {
         return likeCNT;
     }
 
