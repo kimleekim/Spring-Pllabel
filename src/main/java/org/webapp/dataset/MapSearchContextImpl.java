@@ -1,5 +1,6 @@
 package org.webapp.dataset;
 
+import com.sun.org.apache.bcel.internal.generic.DUP;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -90,10 +91,9 @@ public class MapSearchContextImpl implements MapSerachContext {
         searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
 
         checkAndPutKeyword(searchArea, station);
-
-        System.out.println(44444);
+        
         while (true) {
-            System.out.println("페이지 넘어갔다.");
+
             restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
 
             toKnowPageChanged = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")).getText();
@@ -170,18 +170,17 @@ public class MapSearchContextImpl implements MapSerachContext {
         searchArea.sendKeys(station + " 음식점");
 
         while(!isWebLoad) {
-            System.out.println(111111);
+
             searchArea.submit();
             searchArea.sendKeys(Keys.ENTER);
 
             searchArea.clear();
-            System.out.println("여기11111: " + searchArea.getText());
 
             try {
                 try {
                     webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
                 } catch(TimeoutException e) {
-                    searchArea.sendKeys(station + "음식점");
+                    searchArea.sendKeys(station + " 음식점");
                     continue;
                 }
                 System.out.println(333);
@@ -197,12 +196,12 @@ public class MapSearchContextImpl implements MapSerachContext {
                 else {
                     searchArea.clear();
                     searchArea.sendKeys(station + " 음식점");
-                    System.out.println("여기2222222: " + searchArea.getText());
                 }
+
             } catch (NoSuchElementException e) {
                 searchArea.clear();
                 searchArea.sendKeys(station + " 음식점");
-                System.out.println("여기333333: " + searchArea.getText());
+
                 continue;
             }
         }
@@ -245,14 +244,66 @@ public class MapSearchContextImpl implements MapSerachContext {
 
     private String searchRightPlace(WebElement searchArea, String station) {
         By detailPlaceLocator = null;
+        int listCount = 1;
+        int endCount;
+        String xpath;
+        String subway;
+        boolean onlyOneResult = false;
+        String resultCount;
+
+        resultCount = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.cnt\"]")).getText();
 
         searchArea.clear();
         webDriverWait.until(ExpectedConditions.textToBePresentInElement(searchArea, ""));
         searchArea.sendKeys("지하철 " + station);
-        searchArea.submit();
-        searchArea.sendKeys(Keys.ENTER);
 
-        detailPlaceLocator = By.cssSelector("#info\\.search\\.place\\.list > li.PlaceItem.clickArea.PlaceItem-DUP.PlaceItem-ACTIVE > div.head_item.clickArea > span");
+        retryingFindClick(By.xpath("//*[@id=\"search.keyword.submit\"]"));
+        webDriverWait.until(not(ExpectedConditions.textToBe(By.xpath("//*[@id=\"info.search.place.cnt\"]"), resultCount)));
+
+        endCount = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li")).size();
+
+        if(endCount > 16)
+            endCount = 16;
+
+        while(listCount <= endCount) {
+            try {
+                xpath = "//*[@id=\"info.search.place.list\"]/li[" + listCount + "]/div[3]";
+                subway = webDriver.findElement(By.xpath(xpath + "/span")).getText();
+
+                if(endCount == 2) {
+                    onlyOneResult = true;
+                    break;
+                }
+
+                if(! webDriver
+                        .findElement(By.cssSelector("#info\\.search\\.place\\.list > li:nth-child(" + listCount + ") > div.head_item.clickArea > strong > a.link_name"))
+                        .getText()
+                        .contains(station)) {
+
+                    break;
+                }
+
+                if(subway.substring(0, 3).equals("수도권") || subway.equals("분당선")) {
+                    break;
+                }
+                else {
+                    listCount++;
+                    continue;
+                }
+
+            } catch(NoSuchElementException e) {
+                listCount++;
+                continue;
+            }
+        }
+
+        if(onlyOneResult) {
+            detailPlaceLocator = By.cssSelector("#info\\.search\\.place\\.list > li.PlaceItem.clickArea.PlaceItem-DUP.PlaceItem-ACTIVE > div.head_item.clickArea > span");
+        }
+        else {
+            detailPlaceLocator = By.cssSelector("#info\\.search\\.place\\.list > li:nth-child(" + listCount + ") > div.head_item.clickArea > span");
+        }
+
         retryingFindClick(detailPlaceLocator);
 
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"info.search.place.breadcrumb\"]")));
@@ -283,8 +334,14 @@ public class MapSearchContextImpl implements MapSerachContext {
             } catch(ElementClickInterceptedException
                     | NoSuchElementException
                     | StaleElementReferenceException e) {
-                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+
+                try {
+                    webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+                } catch(TimeoutException exception) {
+                    continue;
+                }
             }
+
         }
     }
 }
