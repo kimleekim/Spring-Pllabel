@@ -93,9 +93,7 @@ public class MapSearchContextImpl implements MapSerachContext {
         checkAndPutKeyword(searchArea, station);
         
         while (true) {
-
             restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
-
             toKnowPageChanged = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")).getText();
 
             for (WebElement restaurant : restaurantList) {
@@ -112,39 +110,49 @@ public class MapSearchContextImpl implements MapSerachContext {
                             insertRestaurantList.add(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText());
                         }
                     }
-                } catch (Exception e) {
+                } catch (NoSuchElementException e) {
+                    continue;
+                } catch (TimeoutException ee) {
                     continue;
                 }
             }
             if (totalCount == 1) {
                 try {
-                    webDriver.findElement(By.xpath("//*[@id=\"info.search.place.more\"]")).sendKeys(Keys.ENTER);
-                } catch (Exception e) {
+                    retryingFindClick(By.xpath("//*[@id=\"info.search.place.more\"]"));
+                } catch (NoSuchElementException e) {
                     break;
+                } catch (TimeoutException ee) {
+                    continue;
                 }
             }
             else {
                 if (isFifth) {
                     isFifth = false;
                     try {
-                        webDriver.findElement(By.xpath("//*[@id=\"info.search.page.next\"]")).sendKeys(Keys.ENTER);
-                    } catch (Exception e) {
+                        retryingFindClick(By.xpath("//*[@id=\"info.search.page.next\"]"));
+                    } catch (NoSuchElementException e) {
                         break;
+                    } catch (TimeoutException ee) {
+                        continue;
                     }
                 }
                 else if (totalCount % 5 == 0) {
                     try {
                         isFifth = true;
-                        webDriver.findElement(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + 5 + "]")).sendKeys(Keys.ENTER);
-                    } catch (Exception e) {
+                        retryingFindClick(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + 5 + "]"));
+                    } catch (NoSuchElementException e) {
                         break;
+                    } catch (TimeoutException ee) {
+                        continue;
                     }
                 }
                 else {
                     try {
-                        webDriver.findElement(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + totalCount % 5 + "]")).sendKeys(Keys.ENTER);
-                    } catch (Exception e) {
+                        retryingFindClick(By.xpath("//div[@id=\"info.search.page\"]/div/a[" + totalCount % 5 + "]"));
+                    } catch (NoSuchElementException e) {
                         break;
+                    } catch (TimeoutException ee) {
+                        continue;
                     }
                 }
             }
@@ -153,8 +161,9 @@ public class MapSearchContextImpl implements MapSerachContext {
                 webDriverWait.until(not(ExpectedConditions.textToBePresentInElement(webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")), toKnowPageChanged)));
             } catch(TimeoutException e) {
                 continue;
+            } catch (NoSuchElementException ee) {
+                continue;
             }
-
             searchArea.clear();
         }
         return insertRestaurantList;
@@ -165,17 +174,13 @@ public class MapSearchContextImpl implements MapSerachContext {
         String checkWebLoad = null;
         String rightPlace = null;
 
-
         searchArea.clear();
         searchArea.sendKeys(station + " 음식점");
 
         while(!isWebLoad) {
-
             searchArea.submit();
             searchArea.sendKeys(Keys.ENTER);
-
             searchArea.clear();
-
             try {
                 try {
                     webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
@@ -201,7 +206,6 @@ public class MapSearchContextImpl implements MapSerachContext {
             } catch (NoSuchElementException e) {
                 searchArea.clear();
                 searchArea.sendKeys(station + " 음식점");
-
                 continue;
             }
         }
@@ -219,20 +223,16 @@ public class MapSearchContextImpl implements MapSerachContext {
         By searchHeaderLocator;
 
         searchHeaderLocator = By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p");
-
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchHeaderLocator));
         searchHeader = webDriver.findElement(searchHeaderLocator)
                     .getText();
-
         try {
             resultPlace = webDriver
                     .findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[5]/div[2]/p[1]"))
                     .getText();
-
         } catch(NoSuchElementException e) {
             resultPlace = "";
         }
-
         if(! searchHeader.contains("서울") && !resultPlace.substring(0, 2).equals("서울")) {
             checkedStation = searchRightPlace(searchArea, station);
         }
@@ -252,14 +252,12 @@ public class MapSearchContextImpl implements MapSerachContext {
         String resultCount;
 
         resultCount = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.cnt\"]")).getText();
-
         searchArea.clear();
         webDriverWait.until(ExpectedConditions.textToBePresentInElement(searchArea, ""));
         searchArea.sendKeys("지하철 " + station);
 
         retryingFindClick(By.xpath("//*[@id=\"search.keyword.submit\"]"));
         webDriverWait.until(not(ExpectedConditions.textToBe(By.xpath("//*[@id=\"info.search.place.cnt\"]"), resultCount)));
-
         endCount = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li")).size();
 
         if(endCount > 16)
