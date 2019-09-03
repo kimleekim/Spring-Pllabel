@@ -1,4 +1,4 @@
-package org.webapp.dao;
+package org.webapp.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.webapp.model.Instaplace;
