@@ -14,6 +14,8 @@ import org.webapp.model.Overall;
 import javax.sql.DataSource;
 import java.util.*;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.not;
+
 
 @Component
 public class MapSearchContextImpl implements MapSerachContext {
@@ -76,52 +78,25 @@ public class MapSearchContextImpl implements MapSerachContext {
     public List<String> getRestaurantList(String station) throws Exception {
         int totalCount = 1;
         boolean isFifth = false;
-        String checkWebLoad = null;
-        boolean isWebLoad = false;
+        WebElement searchArea;
+        String toKnowPageChanged = null;
+        List<WebElement> restaurantList;
         List<String> insertRestaurantList = new ArrayList<>();
 
         this.webDriver = chromeDriverContext.setupChromeDriver();
         this.webDriverWait = new WebDriverWait(this.webDriver, 20);
 
         webDriver.get(url);
-        WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
-        searchArea.clear();
-        searchArea.sendKeys(station + "역 음식점");
+        searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
 
-        while(!isWebLoad) {
-            System.out.println(111111);
-            searchArea.sendKeys(Keys.ENTER);
-            searchArea.clear();
-            try {
-                try {
-                    webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
-                } catch(TimeoutException e) {
-                    continue;
-                }
-                System.out.println(333);
-                try {
-                    checkWebLoad = webDriver.findElement(By.id("search.keyword.query")).getAttribute("value");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                int count = StringUtils.countOccurrencesOf(checkWebLoad, station + "역");
-                if (count == 1) {
-                    isWebLoad = true;
-                }
-                else {
-                    searchArea.clear();
-                    searchArea.sendKeys(station + "역 음식점");
-                }
-            } catch (NoSuchElementException e) {
-                searchArea.clear();
-                searchArea.sendKeys(station + "역 음식점");
-                continue;
-            }
-        }
+        checkAndPutKeyword(searchArea, station);
+
         System.out.println(44444);
         while (true) {
             System.out.println("페이지 넘어갔다.");
-            List<WebElement> restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
+            restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
+
+            toKnowPageChanged = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")).getText();
 
             for (WebElement restaurant : restaurantList) {
                 try {
@@ -132,6 +107,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                         continue;
                     }
                     else {
+                        System.out.println(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText());
                         if (!insertRestaurantList.contains(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText())) {
                             insertRestaurantList.add(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText());
                         }
@@ -173,10 +149,142 @@ public class MapSearchContextImpl implements MapSerachContext {
                 }
             }
             totalCount++;
-            Thread.sleep(1000);
-//            webDriverWait.until(webDriver1 ->  ((JavascriptExecutor)webDriver1).executeScript("return document.readyState").equals("complete"));
+            try {
+                webDriverWait.until(not(ExpectedConditions.textToBePresentInElement(webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")), toKnowPageChanged)));
+            } catch(TimeoutException e) {
+                continue;
+            }
+
             searchArea.clear();
         }
         return insertRestaurantList;
+    }
+
+    private void checkAndPutKeyword(WebElement searchArea, String station) {
+        boolean isWebLoad = false;
+        String checkWebLoad = null;
+        String rightPlace = null;
+
+
+        searchArea.clear();
+        searchArea.sendKeys(station + " 음식점");
+
+        while(!isWebLoad) {
+            System.out.println(111111);
+            searchArea.submit();
+            searchArea.sendKeys(Keys.ENTER);
+
+            searchArea.clear();
+            System.out.println("여기11111: " + searchArea.getText());
+
+            try {
+                try {
+                    webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p")));
+                } catch(TimeoutException e) {
+                    searchArea.sendKeys(station + "음식점");
+                    continue;
+                }
+                System.out.println(333);
+                try {
+                    checkWebLoad = webDriver.findElement(By.id("search.keyword.query")).getAttribute("value");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                int count = StringUtils.countOccurrencesOf(checkWebLoad, station);
+                if (count == 1) {
+                    isWebLoad = true;
+                }
+                else {
+                    searchArea.clear();
+                    searchArea.sendKeys(station + " 음식점");
+                    System.out.println("여기2222222: " + searchArea.getText());
+                }
+            } catch (NoSuchElementException e) {
+                searchArea.clear();
+                searchArea.sendKeys(station + " 음식점");
+                System.out.println("여기333333: " + searchArea.getText());
+                continue;
+            }
+        }
+        rightPlace = checkRightPlace(searchArea, station);
+
+        if(rightPlace != null) {
+            checkAndPutKeyword(searchArea, rightPlace);
+        }
+    }
+
+    private String checkRightPlace(WebElement searchArea, String station) {
+        String searchHeader = null;
+        String resultPlace = null;
+        String checkedStation = null;
+        By searchHeaderLocator;
+
+        searchHeaderLocator = By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p");
+
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchHeaderLocator));
+        searchHeader = webDriver.findElement(searchHeaderLocator)
+                    .getText();
+
+        try {
+            resultPlace = webDriver
+                    .findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[5]/div[2]/p[1]"))
+                    .getText();
+
+        } catch(NoSuchElementException e) {
+            resultPlace = "";
+        }
+
+        if(! searchHeader.contains("서울") && !resultPlace.substring(0, 2).equals("서울")) {
+            checkedStation = searchRightPlace(searchArea, station);
+        }
+        else if(resultPlace == "") {
+            checkedStation = null;
+        }
+        return checkedStation;
+    }
+
+    private String searchRightPlace(WebElement searchArea, String station) {
+        By detailPlaceLocator = null;
+
+        searchArea.clear();
+        webDriverWait.until(ExpectedConditions.textToBePresentInElement(searchArea, ""));
+        searchArea.sendKeys("지하철 " + station);
+        searchArea.submit();
+        searchArea.sendKeys(Keys.ENTER);
+
+        detailPlaceLocator = By.cssSelector("#info\\.search\\.place\\.list > li.PlaceItem.clickArea.PlaceItem-DUP.PlaceItem-ACTIVE > div.head_item.clickArea > span");
+        retryingFindClick(detailPlaceLocator);
+
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"info.search.place.breadcrumb\"]")));
+
+        if(webDriver.findElement(By.xpath("//*[@id=\"info.search.place.breadcrumb\"]/a[2]")).getText().equals("지하철,전철")) {
+
+            return webDriver
+                    .findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]"))
+                    .getText();
+        }
+
+        else return searchRightPlace(searchArea, station);
+
+    }
+
+    private void retryingFindClick(By by) {
+        WebElement element;
+        JavascriptExecutor executor;
+
+        while(true) {
+            try {
+                element = webDriver.findElement(by);
+                executor = (JavascriptExecutor)webDriver;
+                executor.executeScript("arguments[0].click();", element);
+
+                break;
+
+            } catch(ElementClickInterceptedException
+                    | NoSuchElementException
+                    | StaleElementReferenceException e) {
+                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+            }
+        }
     }
 }
