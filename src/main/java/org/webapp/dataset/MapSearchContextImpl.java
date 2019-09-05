@@ -62,7 +62,12 @@ public class MapSearchContextImpl implements MapSerachContext {
                         if (station.findElement(By.xpath(".//div[3]/strong/a[2]")).getAttribute("title").contains(subway.get("station"))) {
                             if (station.findElement(By.xpath(".//div[5]/div[2]/p[1]")).getText().contains("서울")) {
                                 System.out.println("추가될 지하철역 : " + subway.get("station"));
-                                overall.setStation(subway.get("station"));
+                                if((subway.get("station") + "역").equals("서울역역")) {
+                                    overall.setStation(subway.get("station"));
+                                }
+                                else {
+                                    overall.setStation(subway.get("station") + "역");
+                                }
                                 overallDao.save(overall);
                             }
                             break;
@@ -73,6 +78,11 @@ public class MapSearchContextImpl implements MapSerachContext {
                 }
             }
             searchArea.clear();
+            if (subway.get("station").equals("수원")) {
+                System.out.println("추가될 지하철역 : " + subway.get("station"));
+                overall.setStation(subway.get("station") + "역");
+                overallDao.save(overall);
+            }
         }
     }
 
@@ -91,10 +101,26 @@ public class MapSearchContextImpl implements MapSerachContext {
         searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
 
         checkAndPutKeyword(searchArea, station);
-        
+        int totalRestaurantCount = Integer.parseInt(webDriver.findElement(By.xpath("//*[@id=\"info.search.place.cnt\"]"))
+                .getText()
+                .replaceAll("\\,", ""));
+
         while (true) {
             restaurantList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
-            toKnowPageChanged = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")).getText();
+
+            try {
+                toKnowPageChanged = webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")).getText();
+            } catch (NoSuchElementException lastpage) {
+                if (totalRestaurantCount < 500 && totalCount < totalRestaurantCount/15 || totalRestaurantCount >= 500 && totalCount <= 34) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            } catch (TimeoutException e) {
+                System.out.println("1 timeout");
+                continue;
+            }
 
             for (WebElement restaurant : restaurantList) {
                 try {
@@ -105,14 +131,14 @@ public class MapSearchContextImpl implements MapSerachContext {
                         continue;
                     }
                     else {
-                        System.out.println(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText());
                         if (!insertRestaurantList.contains(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText())) {
                             insertRestaurantList.add(restaurant.findElement(By.xpath(".//div[3]/strong/a[2]")).getText());
                         }
                     }
-                } catch (NoSuchElementException e) {
+                } catch (NoSuchElementException bugORad) {
                     continue;
                 } catch (TimeoutException ee) {
+                    System.out.println("2 timeout");
                     continue;
                 }
             }
@@ -122,6 +148,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                 } catch (NoSuchElementException e) {
                     break;
                 } catch (TimeoutException ee) {
+                    System.out.println("3 timeout");
                     continue;
                 }
             }
@@ -133,6 +160,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                     } catch (NoSuchElementException e) {
                         break;
                     } catch (TimeoutException ee) {
+                        System.out.println("4 timeout");
                         continue;
                     }
                 }
@@ -143,6 +171,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                     } catch (NoSuchElementException e) {
                         break;
                     } catch (TimeoutException ee) {
+                        System.out.println("5 timeout");
                         continue;
                     }
                 }
@@ -152,6 +181,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                     } catch (NoSuchElementException e) {
                         break;
                     } catch (TimeoutException ee) {
+                        System.out.println("6 timeout");
                         continue;
                     }
                 }
@@ -160,12 +190,23 @@ public class MapSearchContextImpl implements MapSerachContext {
             try {
                 webDriverWait.until(not(ExpectedConditions.textToBePresentInElement(webDriver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[3]/strong/a[2]")), toKnowPageChanged)));
             } catch(TimeoutException e) {
-                continue;
+                System.out.println("7 timeout");
+                if (totalRestaurantCount/15 < 34 && totalCount >= totalRestaurantCount/15) {
+                    break;
+                }
+                else if (totalCount > 34) {
+                    break;
+                }
+                else {
+                    totalCount--;
+                    continue;
+                }
             } catch (NoSuchElementException ee) {
                 continue;
             }
             searchArea.clear();
         }
+        System.out.println(station + ": " + insertRestaurantList.size());
         return insertRestaurantList;
     }
 
@@ -188,7 +229,6 @@ public class MapSearchContextImpl implements MapSerachContext {
                     searchArea.sendKeys(station + " 음식점");
                     continue;
                 }
-                System.out.println(333);
                 try {
                     checkWebLoad = webDriver.findElement(By.id("search.keyword.query")).getAttribute("value");
                 } catch (Exception e) {
