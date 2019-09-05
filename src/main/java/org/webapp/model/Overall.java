@@ -15,15 +15,17 @@ public class Overall {
     private int instaCNT;
     private int youtubeCNT;
     private long likeCNT;
+    private long searchCNT;
 
     private final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public Overall(String station, String restaurants, int instaCNT, int youtubeCNT, long likeCNT) {
+    public Overall(String station, String restaurants, int instaCNT, int youtubeCNT, long likeCNT, long searchCNT) {
         this.station = station;
         this.restaurants = restaurants;
         this.instaCNT = instaCNT;
         this.youtubeCNT = youtubeCNT;
         this.likeCNT = likeCNT;
+        this.searchCNT = searchCNT;
     }
 
     public Overall() {}
@@ -91,11 +93,19 @@ public class Overall {
         return youtubeCNT;
     }
 
-    public void setLikeCNT(int likeCNT) {
+    public void setLikeCNT(long likeCNT) {
         this.likeCNT = likeCNT;
     }
 
     public long getLikeCNT() {
         return likeCNT;
+    }
+
+    public void setSearchCNT(long searchCNT) {
+        this.searchCNT = searchCNT;
+    }
+
+    public long getSearchCNT() {
+        return searchCNT;
     }
 }
