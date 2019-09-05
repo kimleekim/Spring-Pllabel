@@ -14,7 +14,8 @@ public class OverallMapper implements RowMapper<Overall> {
         overall.setStation(rs.getString("station"));
         overall.setInstaCNT(rs.getInt("instaCNT"));
         overall.setYoutubeCNT(rs.getInt("youtubeCNT"));
-        overall.setLikeCNT(rs.getInt("likeCNT"));
+        overall.setLikeCNT(rs.getLong("likeCNT"));
+        overall.setSearchCNT(rs.getLong("searchCNT"));
         return overall;
     }
 }

@@ -52,7 +52,7 @@ public class OverallDao extends Dao<Overall> {
     }
 
     public void update(Map<Object, String> parameter, int conditionPosition) {
-//        conditionPosition = n번째 데이터부터가 set절에 대한 조건이다 라는 표시 (1번째 데이터 = index 0인 데이터 인 것 주의)
+//        conditionPosition = n번째 데이터부터가 set절에 대한 조건이다 라는 표시
         List<Map<String, Object>> parameters = separateParameter(parameter, conditionPosition);
         sql = "update overall set ";
         sql = selectTarget("Overall", parameters.get(0), sql);
@@ -62,8 +62,8 @@ public class OverallDao extends Dao<Overall> {
 
     private List<Map<String, Object>> separateParameter (Map<Object, String> parameter, int conditionPosition) {
         List<Map<String, Object>> parameters = new ArrayList<>();
-        Map<String, Object> setParameter = new HashMap<>();
-        Map<String, Object> whereParameter = new HashMap<>();
+        Map<String, Object> setParameter = new LinkedHashMap<>();
+        Map<String, Object> whereParameter = new LinkedHashMap<>();
         Set<Object> keySet = parameter.keySet();
         Iterator<Object> keys = keySet.iterator();
 

@@ -14,8 +14,8 @@ public class InstarankingMapper implements RowMapper<Instaranking> {
         instaranking.setKey(rs.getInt("key"));
         instaranking.setStation(rs.getString("station"));
         instaranking.setPlacetag(rs.getString("placetag"));
-        instaranking.setPlacetagCNT(rs.getInt("placetagCNT"));
-        instaranking.setLikeCNT(rs.getInt("likeCNT"));
+        instaranking.setPlacetagCNT(rs.getLong("placetagCNT"));
+        instaranking.setLikeCNT(rs.getLong("likeCNT"));
         return instaranking;
     }
 }

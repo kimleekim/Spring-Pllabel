@@ -50,11 +50,11 @@ public class Instaranking {
         this.placetag = placetag;
     }
 
-    public void setPlacetagCNT(int placetagCNT) {
+    public void setPlacetagCNT(long placetagCNT) {
         this.placetagCNT = placetagCNT;
     }
 
-    public void setLikeCNT(int likeCNT) {
+    public void setLikeCNT(long likeCNT) {
         this.likeCNT = likeCNT;
     }
 }
