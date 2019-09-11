@@ -57,8 +57,17 @@ public class BatchConfiguration {
     public JobLauncher jobLauncher() throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
         jobLauncher.setJobRepository(jobRepository());
-        //jobLauncher.setTaskExecutor(ThreadPoolTaskExecutor);
+        jobLauncher.setTaskExecutor(threadPoolTaskExecutor());
         return jobLauncher;
+    }
+
+    @Bean
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setQueueCapacity(30);
+        taskExecutor.setCorePoolSize(1);
+        taskExecutor.setMaxPoolSize(8);
+        return taskExecutor;
     }
 
     @Bean
@@ -73,6 +82,5 @@ public class BatchConfiguration {
         jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
         return jobRegistryBeanPostProcessor;
     }
-
 
 }

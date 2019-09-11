@@ -2,6 +2,7 @@ package org.webapp.config;
 
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;

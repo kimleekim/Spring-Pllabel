@@ -1,6 +1,5 @@
 package org.webapp.dataset;
 
-import com.sun.org.apache.bcel.internal.generic.DUP;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -45,11 +44,14 @@ public class MapSearchContextImpl implements MapSerachContext {
     public void getStationList () throws Exception {
         Overall overall = new Overall();
         this.webDriver = chromeDriverContext.setupChromeDriver();
+
         webDriver.get(url);
+
         for (Map<String, String> subway : subwayList) {
             if (subway.get("station").equals("총신대입구")) {
                 continue;
             }
+
             WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
             searchArea.sendKeys(subway.get("station") + "역");
             searchArea.sendKeys(Keys.ENTER);
@@ -57,6 +59,7 @@ public class MapSearchContextImpl implements MapSerachContext {
 
             List<WebElement> stationList = webDriver.findElements(By.xpath("//*[@id=\"info.search.place.list\"]/li"));
             for (WebElement station : stationList) {
+
                 try {
                     if (station.findElement(By.xpath(".//div[3]/span")).getText().contains("수도권") || station.findElement(By.xpath(".//div[3]/span")).getText().contains("분당선")) {
                         if (station.findElement(By.xpath(".//div[3]/strong/a[2]")).getAttribute("title").contains(subway.get("station"))) {
@@ -74,10 +77,11 @@ public class MapSearchContextImpl implements MapSerachContext {
                         }
                     }
                 } catch (Exception e) {
-                    continue;
                 }
+
             }
             searchArea.clear();
+
             if (subway.get("station").equals("수원")) {
                 System.out.println("추가될 지하철역 : " + subway.get("station"));
                 overall.setStation(subway.get("station") + "역");
@@ -98,6 +102,8 @@ public class MapSearchContextImpl implements MapSerachContext {
         this.webDriverWait = new WebDriverWait(this.webDriver, 20);
 
         webDriver.get(url);
+
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"search.keyword.query\"]")));
         searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
 
         checkAndPutKeyword(searchArea, station);
@@ -265,7 +271,7 @@ public class MapSearchContextImpl implements MapSerachContext {
         searchHeaderLocator = By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p");
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchHeaderLocator));
         searchHeader = webDriver.findElement(searchHeaderLocator)
-                    .getText();
+                .getText();
         try {
             resultPlace = webDriver
                     .findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[5]/div[2]/p[1]"))
@@ -383,3 +389,4 @@ public class MapSearchContextImpl implements MapSerachContext {
         }
     }
 }
+
