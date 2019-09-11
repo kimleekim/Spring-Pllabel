@@ -59,7 +59,7 @@ public class DataSourceContext {
         return new DataSourceTransactionManager(dataSource());
     }
 
-    @Bean DataSourceTransactionManager transactionManagerForQuartz() {
+    @Bean DataSourceTransactionManager transactionManagerForBatch() {
         return new DataSourceTransactionManager(dataSourceForBatchJobs());
     }
 
