@@ -3,6 +3,8 @@ package org.webapp.dataset;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +18,10 @@ import java.util.List;
 
 @Component
 public class InstaCrawlImpl implements InstaCrawl {
+    private static final Logger logger = LoggerFactory.getLogger(InstaCrawlImpl.class);
     @Autowired
     S3Connector s3Connector;
+
     private WebDriver driver;
     private ChromeDriverContext driverContext;
     private WebDriverWait webDriverWait;
@@ -48,6 +52,21 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.driverContext = driverContext;
     }
 
+    /*
+    *
+    *  @param
+    *   isFoodPost = 1 => "이미지 : 음식" 인 이미지 crawl (insta-food)
+    *   isFoodPost = 2 => "이미지 : 실내/실외" 인 이미지 crawl (insta-hot)
+    *
+     */
+    public void setIsFoodPost(int isFoodPost) {
+        this.isFoodpost = isFoodPost;
+    }
+
+    public int getIsFoodpost() {
+        return this.isFoodpost;
+    }
+
     @Override
     public WebDriver setUpWebDriver (String search, String station) throws Exception {
         //초기 드라이버 셋팅
@@ -55,7 +74,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         else { isFoodpost = 2; }
 
         this.driver = driverContext.setupChromeDriver();
-        this.webDriverWait = new WebDriverWait(this.driver, 20);
+        this.webDriverWait = new WebDriverWait(this.driver, 40);
         driver.manage().window().maximize();
         this.skipPopularposts = 9;
         driver.get(search);
@@ -67,7 +86,7 @@ public class InstaCrawlImpl implements InstaCrawl {
             totalPostCount = Integer.parseInt(element.getText().replaceAll("\\,", ""));
             System.out.println("total: " + totalPostCount);
         } catch (TimeoutException e) {
-            System.out.println("전체 게시물 수 가져오기 실패!");
+            logger.info("FAIL to get Total-posts-Count.");
             refreshPage(driver);
         }
 
@@ -91,17 +110,20 @@ public class InstaCrawlImpl implements InstaCrawl {
 
     @Override
     public int waitPage (WebDriver driver, int position, int skipPosts) {
-        //초기 화면에서 갈림길 역할, 마지막 포스트인지 알려주는 역할
         this.driver = driver;
+
         if (position == goTargetpost) {
             moveTargetPost(driver, skipPosts);
         }
         else if (position == goNextpost) {
-            if(clickNextButton(this.driver) == false) {
-                return reachLastpost;
+
+            if(! clickNextButton(this.driver)) {
+                return reachLastpost; //return 3
             }
+
         }
-        return noExceptionOccur;
+
+        return noExceptionOccur; //return 4
     }
 
     private boolean waitImageLoad (WebDriver driver) {
@@ -115,7 +137,8 @@ public class InstaCrawlImpl implements InstaCrawl {
                 isNormal = true;
                 break;
             } catch (TimeoutException e) {
-                System.out.println("이미지 로드중");
+                logger.info("Loading Image Now ...");
+
                 if (isNormal) {
                     isNormal = false;
                 }
@@ -161,9 +184,10 @@ public class InstaCrawlImpl implements InstaCrawl {
     }
 
     private int moveTargetPost(WebDriver driver, int skipPosts) {
-        //원하는 크롤링 포스트까지 이동시켜줌
         this.driver = driver;
+
         try {
+
             while (true) {
                 this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/article/div[1]/div/div/div[1]/div[1]/a");
                 webDriverWait.until(ExpectedConditions.elementToBeClickable(findWebElement));
@@ -171,13 +195,16 @@ public class InstaCrawlImpl implements InstaCrawl {
                 if (!waitImageLoad(driver)) { closePost(driver); refreshPage(driver); }
                 else { break; }
             }
+
             for (int post = 0; post < skipPosts; post++) {
                 clickNextButton(driver);
                 waitImageLoad(driver);
             }
+
             return noExceptionOccur;
+
         } catch (TimeoutException e) {
-            System.out.println("첫번째 게시물 안 눌림!");
+            //System.out.println("첫번째 게시물 안 눌림!");
             refreshPage(driver);
             return exceptionOccur;
         }
@@ -189,17 +216,23 @@ public class InstaCrawlImpl implements InstaCrawl {
         boolean doesNextExist = false;
 
         try {
+
             this.findWebElement = By.cssSelector("body > div._2dDPU.vCf6V > div.EfHg9 > div > div > a.HBoOv.coreSpriteRightPaginationArrow");
             webDriverWait.until(ExpectedConditions.elementToBeClickable(findWebElement));
             doesNextExist = true;
             retryingFindClick(findWebElement);
             waitImageLoad(driver);
+
         } catch (NoSuchElementException reach_last_post) {
-            System.out.println("마지막 포스트!");
+
+            logger.info("Last post. ");
             closePost(driver);
             doesNextExist = false;
+
         } catch (TimeoutException e) {
-            System.out.println("다음 버튼 로드 실패!");
+
+            logger.info("FAIL to load next Page.");
+
         }
         //새로운 검색어 넣는 작업 필요 (리턴값이 false면)
         return doesNextExist;
@@ -217,19 +250,26 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.driver = driver;
         String realdate = "";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM dd, yyyy");
+        By by = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time");;
 
         try {
-            this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time"));
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+            this.element = driver.findElement(by);
             realdate = element.getAttribute("title");
+
         } catch (NoSuchElementException one_more_try) {
+
             try {
-                this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time"));
+                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+                this.element = driver.findElement(by);
                 realdate = element.getAttribute("title");
             } catch (NoSuchElementException no_date_exist) {
                 realdate = "";
             }
+
         } catch (NullPointerException e) {
             realdate = "";
+
         } finally {
             if (!realdate.equals("")) {
                 realdate = getMonth(realdate);
@@ -246,53 +286,54 @@ public class InstaCrawlImpl implements InstaCrawl {
     private String getMonth(String date) {
         switch (date.substring(0, 3)) {
             case "Jan" :
-//                date.replace("Jan", "January");
                 date = date.replace("Jan", "1");
                 break;
+
             case "Feb" :
-//                date.replace("Feb", "February");
                 date = date.replace("Feb", "2");
                 break;
+
             case "Mar" :
-//                date.replace("Mar", "March");
                 date = date.replace("Mar", "3");
                 break;
+
             case "Apr" :
-//                date.replace("Apr", "April");
                 date = date.replace("Apr", "4");
                 break;
+
             case "May" :
                 date = date.replace("May", "5");
                 break;
+
             case "Jun" :
-//                date.replace("Jun", "June");
                 date = date.replace("Jun", "6");
                 break;
+
             case "Jul" :
-//                date.replace("Jul", "July");
                 date = date.replace("Jul", "7");
                 break;
+
             case "Aug" :
-//                date.replace("Aug", "August");
                 date = date.replace("Aug", "8");
                 break;
+
             case "Sep" :
-//                date.replace("Sep", "September");
                 date = date.replace("Sep", "9");
                 break;
+
             case "Oct" :
-//                date.replace("Oct", "October");
                 date = date.replace("Oct", "10");
                 break;
+
             case "Nov" :
-//                date.replace("Nov", "November");
                 date = date.replace("Nov", "11");
                 break;
+
             case "Dec" :
-//                date.replace("Dec", "December");
                 date = date.replace("Dec", "12");
                 break;
         }
+
         return date;
     }
 
@@ -300,17 +341,22 @@ public class InstaCrawlImpl implements InstaCrawl {
     public String getPost(WebDriver driver) {
         this.driver = driver;
         String post = "";
+
         try {
+
             webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[1]/span[1]/button"))));
             this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
             post = element.getText();
+
         } catch (NoSuchElementException one_more_try) {
+
             try {
                 this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
                 post = element.getText();
             } catch (NoSuchElementException no_post_exist) {
                 post = "";
             }
+
         } catch (NullPointerException e) {
             post = "";
         } finally {
@@ -337,6 +383,38 @@ public class InstaCrawlImpl implements InstaCrawl {
             likeCNT = 0;
         }
         return likeCNT;
+    }
+
+    @Override
+    public String getPlacetag(WebDriver driver) {
+        this.driver = driver;
+        String placetag = "";
+        By placeElement;
+
+        try {
+            placeElement = By.cssSelector("body > div._2dDPU.vCf6V > div.zZYga > div > article > header > div.o-MQd.z8cbW > div.M30cS > div.JF9hh > a");
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(placeElement)));
+
+            placetag = driver.findElement(placeElement).getText();
+
+        } catch(NoSuchElementException
+                | TimeoutException one_more_try) {
+
+            try {
+
+                placeElement = By.xpath("/html/body/div[3]/div[2]/div/article/header/div[2]/div[2]/div[2]/a");
+                webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(placeElement)));
+                placetag = driver.findElement(placeElement).getText();
+
+            } catch(Exception e) {
+                placetag = "";
+            }
+
+        } catch(NullPointerException e) {
+            placetag = "";
+        }
+
+        return placetag;
     }
 
     @Override
@@ -378,12 +456,17 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.driver = driver;
 
         driver.get(url);
+
         while (true) {
+
             try {
+
                 this.findWebElement = By.cssSelector("#react-root > svg");
                 webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(findWebElement));
                 break;
+
             } catch (NoSuchElementException e) {
+
                 try {
                     this.findWebElement = By.cssSelector("#react-root > section > main > div > div > article > div.eo2As > section.ltpMr.Slqrh > span.fr66n > button");
                     webDriverWait.until(ExpectedConditions.elementToBeClickable(findWebElement));
@@ -391,23 +474,34 @@ public class InstaCrawlImpl implements InstaCrawl {
                 } catch (TimeoutException ee) {
                     refreshPage(driver);
                 }
+
             } catch (TimeoutException ee) {
                 refreshPage(driver);
             }
+
         }
 
         while (true) {
             try {
                 String description = getDescription(driver, index);
                 System.out.println(description);
-                if (isFoodpost == 1 && description != null && description.contains("food")) {
+                if (isFoodpost == 1
+                        && description != null
+                        && (description.contains("food") || description.contains("음식"))) {
+
                     photoURL = getPhotoSRC(driver, index);
                     break;
+
                 }
-                else if (isFoodpost == 2 && description != null && ((description.contains("indoor") || description.contains("outdoor")))) {
+                else if (isFoodpost == 2
+                        && description != null
+                        && ((description.contains("indoor") || description.contains("outdoor") || description.contains("실내") || description.contains("실외")))) {
+
                     photoURL = getPhotoSRC(driver, index);
                     break;
+
                 }
+
                 if (isFirstPhoto) {
                     driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button"))
                             .click();
@@ -417,32 +511,42 @@ public class InstaCrawlImpl implements InstaCrawl {
                     driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button[2]"))
                             .click();
                 }
+
                 index++;
+
                 try {
+
                     webDriverWait.until(ExpectedConditions.attributeContains(
                             driver.findElement(
                                     By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div")),
                             "style", "0.362783s"
                             )
                     );
+
                 } catch (TimeoutException e) {
                 }
+
                 try {
+
                     webDriverWait.until(ExpectedConditions.attributeContains(
                             driver.findElement(
                                     By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div")),
                             "style", "0s"
                             )
                     );
+
                 } catch (TimeoutException e) {
                     refreshPage(driver);
                 }
+
             } catch (NoSuchElementException e) {
                 break;
             } catch (NullPointerException ee) {
                 break;
             }
+
         }
+
         if (!(photoURL.equals(""))) {
             MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, station);
             return s3Connector.upload(multipartFile, "static");
@@ -450,6 +554,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         else {
             return photoURL;
         }
+
     }
 
     private WebElement setPhotoURLElement(WebDriver driver, int index) {
