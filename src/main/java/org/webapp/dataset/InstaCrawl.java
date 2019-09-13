@@ -23,6 +23,8 @@ public interface InstaCrawl {
 
     public long getLikeCNT(WebDriver driver);
 
+    public String getPlacetag(WebDriver driver);
+
     public String getPhotoURL(WebDriver driver, String station, String url) throws IOException, Exception;
 
     public String getPhotopageURL(WebDriver driver);
