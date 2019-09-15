@@ -18,7 +18,7 @@ public class FileDelete {
         }
         for (int i = 0; i < list.length; i++) {
             try {
-                file = new File(directory + "\\" + list[i]);
+                file = new File(directory + "/" + list[i]);
                 fileOutputStream = new FileOutputStream(file);
                 fileOutputStream.write("a".getBytes());
             } catch (Exception e) {

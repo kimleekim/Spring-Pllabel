@@ -21,6 +21,7 @@ import org.webapp.dao.InstarankingDao;
 import org.webapp.model.Instafood;
 import org.webapp.model.Instaranking;
 import org.webapp.model.Youtubefood;
+import org.webapp.model.Youtubehot;
 
 import java.io.*;
 import java.net.URL;
@@ -68,10 +69,7 @@ public class YoutubeApiTrim {
             return keywords;
         }
         else if (isFoodVideo == 2) {
-            parameter.put("placetag", keyword);
-            Instaranking instaranking = instarankingDao.findByParam(parameter).get(0);
-            inputQuery = instaranking.getPlacetag();
-            keywords.add(inputQuery);
+            keywords.add(keyword);
             return keywords;
         }
         else {
@@ -79,7 +77,9 @@ public class YoutubeApiTrim {
         }
     }
 
-    private List<Object> insertVideoData(Iterator<SearchResult> iteratorSearchResults, String station, Properties properties) throws InterruptedException, IOException, JSONException {
+    private List<Object> insertVideoData(
+            Iterator<SearchResult> iteratorSearchResults, String station, Properties properties, int isFoodVideo
+    ) throws InterruptedException, IOException, JSONException {
         List<Object> returnVideoList = new ArrayList<>();
 
         if (!iteratorSearchResults.hasNext()) {
@@ -92,21 +92,37 @@ public class YoutubeApiTrim {
             long publishedDateTemp = singleVideo.getSnippet().getPublishedAt().getValue();
 
             if (rId.getKind().equals("youtube#video")) {
-                Youtubefood youtubefood = new Youtubefood();
+                Youtubefood food;
+                Youtubehot hot;
                 String thumbnailURL = "http://img.youtube.com/vi/" + rId.getVideoId() + "/hqdefault.jpg";
                 String videoLink = "https://www.youtube.com/watch?v=" + rId.getVideoId();
                 thumbnailURL = s3Connector.upload(s3Connector.convertFileDatatype(2, thumbnailURL, station)
                         , "static");
 
-                youtubefood.setStation(station);
-                youtubefood.setTitle(singleVideo.getSnippet().getTitle());
-                youtubefood.setCreator(singleVideo.getSnippet().getChannelTitle());
-                youtubefood.setDate(java.sql.Date.valueOf(convertDateFormat(publishedDateTemp)));
-                youtubefood.setThumbnailURL(thumbnailURL);
-                youtubefood.setVideoLink(videoLink);
-                youtubefood.setTotalview(getViewCountFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
-                youtubefood.setContent(getContentFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
-                returnVideoList.add(youtubefood);
+                if (isFoodVideo == 1) {
+                    food = new Youtubefood();
+                    food.setStation(station);
+                    food.setTitle(singleVideo.getSnippet().getTitle());
+                    food.setCreator(singleVideo.getSnippet().getChannelTitle());
+                    food.setDate(java.sql.Date.valueOf(convertDateFormat(publishedDateTemp)));
+                    food.setThumbnailURL(thumbnailURL);
+                    food.setVideoLink(videoLink);
+                    food.setTotalview(getViewCountFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
+                    food.setContent(getContentFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
+                    returnVideoList.add(food);
+                }
+                else {
+                    hot = new Youtubehot();
+                    hot.setStation(station);
+                    hot.setTitle(singleVideo.getSnippet().getTitle());
+                    hot.setCreator(singleVideo.getSnippet().getChannelTitle());
+                    hot.setDate(java.sql.Date.valueOf(convertDateFormat(publishedDateTemp)));
+                    hot.setThumbnailURL(thumbnailURL);
+                    hot.setVideoLink(videoLink);
+                    hot.setTotalview(getViewCountFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
+                    hot.setContent(getContentFromVideo(properties.getProperty("youtube.apikey"), rId.getVideoId()));
+                    returnVideoList.add(hot);
+                }
             }
         }
         return returnVideoList;
@@ -213,7 +229,7 @@ public class YoutubeApiTrim {
                 search.setQ(queryTerms.get(0));
                 SearchListResponse searchResponse = search.execute();
                 List<SearchResult> searchResultList = searchResponse.getItems();
-                returnVideoList = insertResult(searchResultList, station, properties);
+                returnVideoList = insertResult(searchResultList, station, properties, isFoodVideo);
             }
             else if (isFoodVideo == 1) {
                 returnVideoList = new ArrayList<>();
@@ -221,7 +237,7 @@ public class YoutubeApiTrim {
                     search.setQ(queryTerm);
                     SearchListResponse searchResponse = search.execute();
                     List<SearchResult> searchResultList = searchResponse.getItems();
-                    returnVideoList.add(insertResult(searchResultList, station, properties));
+                    returnVideoList.add(insertResult(searchResultList, station, properties, isFoodVideo));
                 }
             }
         } catch (GoogleJsonResponseException e) {
@@ -236,10 +252,10 @@ public class YoutubeApiTrim {
         }
     }
 
-    private List<Object> insertResult (List<SearchResult> searchResultList, String station, Properties properties) throws IOException, InterruptedException, JSONException {
+    private List<Object> insertResult (List<SearchResult> searchResultList, String station, Properties properties, int isFoodVideo) throws IOException, InterruptedException, JSONException {
         List<Object> returnVideoList = null;
 
-        returnVideoList = insertVideoData(searchResultList.iterator(), station, properties);
+        returnVideoList = insertVideoData(searchResultList.iterator(), station, properties, isFoodVideo);
         return returnVideoList;
     }
 }

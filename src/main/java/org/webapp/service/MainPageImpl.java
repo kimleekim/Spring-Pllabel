@@ -22,10 +22,6 @@ public class MainPageImpl implements MainPage {
 
     @Override
     public boolean isExistStation(String station) {
-        if (!station.substring(station.length() - 1).contains("역")) {
-            StringBuffer stringBuffer = new StringBuffer(station);
-            station += "역";
-        }
         Map<String, Object> input = new HashMap<>();
         input.put("station", station);
         if (overallDao.findByParam(input).size() > 0) {
@@ -42,6 +38,14 @@ public class MainPageImpl implements MainPage {
         else {
             return false;
         }
+    }
+
+    public String setStationframe(String station) {
+        if (!station.substring(station.length() - 1).contains("역")) {
+            StringBuffer stringBuffer = new StringBuffer(station);
+            station += "역";
+        }
+        return station;
     }
 
     @Override
@@ -133,28 +137,12 @@ public class MainPageImpl implements MainPage {
     @Override
     public String[] getTOP3Place() {
         List<Instaranking> totalData = instarankingDao.findAll();
-        List<String> places = new ArrayList<>();
-        List<Long[]> placesCNT = new ArrayList<>();
         Map<String, Long[]> ranking = new HashMap<>();
-        int index = 0;
         Long[] top3 = {Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)};
         String[] top3Place = {"", "", ""};
 
         for (Instaranking data : totalData) {
-            places.add(data.getPlacetag());
-            placesCNT.add(new Long[] {data.getPlacetagCNT(), data.getLikeCNT()});
-        }
-
-        for (String place : places) {
-            if (!ranking.containsKey(place)) {
-                ranking.put(place, new Long[] {placesCNT.get(index)[0], placesCNT.get(index)[1]});
-            }
-            else {
-                Long count = ranking.get(place)[0];
-                Long likeCNT = ranking.get(place)[1];
-                ranking.replace(place, new Long[] {count + placesCNT.get(index)[0], likeCNT + placesCNT.get(index)[1]});
-            }
-            index++;
+            ranking.put(data.getPlacetag(), new Long[] {data.getPlacetagCNT(), data.getLikeCNT()});
         }
 
         for (String place : ranking.keySet()) {
