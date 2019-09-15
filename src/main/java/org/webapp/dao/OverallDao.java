@@ -37,27 +37,27 @@ public class OverallDao extends Dao<Overall> {
 
     @Override
     public List<Overall> findByParam(Map<String, Object> parameter){
-        sql = "select * from Overall where ";
+        sql = "select * from overall where ";
         List<Overall> result;
 
-        result = jdbcTemplate.query(selectTarget("Overall", parameter, sql)
+        result = jdbcTemplate.query(selectTarget("overall", parameter, sql)
                 , new OverallMapper());
         return result;
     }
 
     @Override
     public void delete(Map<String, Object> parameter) {
-        sql = "delete from Overall where ";
-        jdbcTemplate.update(selectTarget("Overall", parameter, sql));
+        sql = "delete from overall where ";
+        jdbcTemplate.update(selectTarget("overall", parameter, sql));
     }
 
     public void update(Map<Object, String> parameter, int conditionPosition) {
 //        conditionPosition = n번째 데이터부터가 set절에 대한 조건이다 라는 표시
         List<Map<String, Object>> parameters = separateParameter(parameter, conditionPosition);
         sql = "update overall set ";
-        sql = selectTarget("Overall", parameters.get(0), sql);
+        sql = selectTarget("overall", parameters.get(0), sql);
         sql += " where ";
-        jdbcTemplate.update(selectTarget("Overall", parameters.get(1), sql));
+        jdbcTemplate.update(selectTarget("overall", parameters.get(1), sql));
     }
 
     private List<Map<String, Object>> separateParameter (Map<Object, String> parameter, int conditionPosition) {
@@ -83,7 +83,7 @@ public class OverallDao extends Dao<Overall> {
 
     @Override
     public List<Overall> findAll() {
-        sql = "select * from Overall";
+        sql = "select * from overall";
         overallList = jdbcTemplate.query(sql, new OverallMapper());
 
         return overallList;
