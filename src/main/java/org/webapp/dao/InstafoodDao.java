@@ -44,7 +44,7 @@ public class InstafoodDao extends Dao<Instafood> {
 
     @Override
     public List<Instafood> findByParam(Map<String, Object> parameter){
-        sql = "select * from Instafood where ";
+        sql = "select * from instafood where ";
         List<Instafood> result;
 
         result = jdbcTemplate.query(selectTarget("Instafood", parameter, sql)
@@ -54,13 +54,13 @@ public class InstafoodDao extends Dao<Instafood> {
 
     @Override
     public void delete(Map<String, Object> parameter) {
-        sql = "delete from Instafood where ";
+        sql = "delete from instafood where ";
         jdbcTemplate.update(selectTarget("Instafood", parameter, sql));
     }
 
     @Override
     public List<Instafood> findAll() {
-        sql = "select * from Instafood";
+        sql = "select * from instafood";
         instafoodList = jdbcTemplate.query(sql, new InstafoodMapper());
 
         return instafoodList;

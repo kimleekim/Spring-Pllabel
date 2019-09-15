@@ -41,23 +41,23 @@ public class InstahotDao extends Dao<Instahot> {
 
     @Override
     public List<Instahot> findByParam(Map<String, Object> parameter){
-        sql = "select * from Instahot where ";
+        sql = "select * from instahot where ";
         List<Instahot> result;
 
-        result = jdbcTemplate.query(selectTarget("Instahot", parameter, sql)
+        result = jdbcTemplate.query(selectTarget("instahot", parameter, sql)
                 , new InstahotMapper());
         return result;
     }
 
     @Override
     public void delete(Map<String, Object> parameter) {
-        sql = "delete from Instahot where ";
-        jdbcTemplate.update(selectTarget("Instahot", parameter, sql));
+        sql = "delete from instahot where ";
+        jdbcTemplate.update(selectTarget("instahot", parameter, sql));
     }
 
     @Override
     public List<Instahot> findAll() {
-        sql = "select * from Instahot";
+        sql = "select * from instahot";
         instahotList = jdbcTemplate.query(sql, new InstahotMapper());
 
         return instahotList;

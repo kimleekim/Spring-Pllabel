@@ -40,23 +40,23 @@ public class InstarankingDao extends Dao<Instaranking> {
 
     @Override
     public List<Instaranking> findByParam(Map<String, Object> parameter){
-        sql = "select * from Instaranking where ";
+        sql = "select * from instaranking where ";
         List<Instaranking> result;
 
-        result = jdbcTemplate.query(selectTarget("Instaranking", parameter, sql)
+        result = jdbcTemplate.query(selectTarget("instaranking", parameter, sql)
                 , new InstarankingMapper());
         return result;
     }
 
     @Override
     public void delete(Map<String, Object> parameter) {
-        sql = "delete from Instaranking where ";
-        jdbcTemplate.update(selectTarget("Instaranking", parameter, sql));
+        sql = "delete from instaranking where ";
+        jdbcTemplate.update(selectTarget("instaranking", parameter, sql));
     }
 
     @Override
     public List<Instaranking> findAll() {
-        sql = "select * from Instaranking";
+        sql = "select * from instaranking";
         instarankingList = jdbcTemplate.query(sql, new InstarankingMapper());
 
         return instarankingList;

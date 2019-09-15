@@ -44,23 +44,23 @@ public class InstaplaceDao extends Dao<Instaplace>{
 
     @Override
     public List<Instaplace> findByParam(Map<String, Object> parameter){
-        sql = "select * from Instaplace where ";
+        sql = "select * from instaplace where ";
         List<Instaplace> result;
 
-        result = jdbcTemplate.query(selectTarget("Instaplace", parameter, sql)
+        result = jdbcTemplate.query(selectTarget("instaplace", parameter, sql)
                                                 , new InstaplaceMapper());
         return result;
     }
 
     @Override
     public void delete(Map<String, Object> parameter) {
-        sql = "delete from Instaplace where ";
+        sql = "delete from instaplace where ";
         jdbcTemplate.update(selectTarget("Instaplace", parameter, sql));
     }
 
     @Override
     public List<Instaplace> findAll() {
-        sql = "select * from Instaplace";
+        sql = "select * from instaplace";
         instaplaceList = jdbcTemplate.query(sql, new InstaplaceMapper());
 
         return instaplaceList;
