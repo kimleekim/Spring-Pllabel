@@ -26,7 +26,7 @@ import java.util.Optional;
 public class S3Connector {
     @Autowired
     private AmazonS3Client amazonS3Client;
-    int fileIndex = 1;
+    int fileIndex = (int) Math.random();
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -52,7 +52,7 @@ public class S3Connector {
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
-    public MultipartFile convertFileDatatype(int isInsta, String photoURL, String station) throws IOException {
+    public MultipartFile convertFileDatatype(int isInsta, String photoURL, String url) throws IOException {
         MultipartFile multipartFile = null;
 
         if (isInsta == 1) {
@@ -62,12 +62,11 @@ public class S3Connector {
         URL convertURL = new URL(photoURL);
         BufferedImage img = ImageIO.read(convertURL.openStream());
 
-        String fileName = station.concat("_".concat(Integer.toString(fileIndex).concat(".jpg")));
+        String fileName = url.concat(Integer.toString(fileIndex).concat(".jpg"));
         File file = new File(fileName);
         ImageIO.write(img, "jpg", file);
         FileInputStream input = new FileInputStream(file);
         multipartFile = new MockMultipartFile(fileName, file.getName(), "image/jpg", IOUtils.toByteArray(input));
-        fileIndex++;
 
         return multipartFile;
     }

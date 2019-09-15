@@ -549,7 +549,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         }
 
         if (!(photoURL.equals(""))) {
-            MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, station);
+            MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, url);
             return s3Connector.upload(multipartFile, "static");
         }
         else {
