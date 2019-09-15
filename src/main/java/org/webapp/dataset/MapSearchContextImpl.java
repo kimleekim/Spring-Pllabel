@@ -51,7 +51,7 @@ public class MapSearchContextImpl implements MapSerachContext {
             if (subway.get("station").equals("총신대입구")) {
                 continue;
             }
-
+            Thread.sleep(1500);
             WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
             searchArea.sendKeys(subway.get("station") + "역");
             searchArea.sendKeys(Keys.ENTER);

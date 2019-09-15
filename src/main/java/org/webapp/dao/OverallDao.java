@@ -28,7 +28,7 @@ public class OverallDao extends Dao<Overall> {
     @Override
     public void save(Overall overall) {
         try {
-            String sql = "insert into overall values (?, \'[]\', 0, 0, 0)";
+            String sql = "insert into overall values (?, \'[]\', 0, 0, 0, 0)";
             jdbcTemplate.update(sql, overall.getStation());
         } catch (Exception e) {
             e.printStackTrace();
