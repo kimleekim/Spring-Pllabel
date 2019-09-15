@@ -2,12 +2,17 @@ package org.webapp.batch.hotplaceJob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.webapp.model.Instaranking;
 
+import javax.sql.DataSource;
 import java.util.*;
 
 @Component
@@ -15,81 +20,105 @@ import java.util.*;
 public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetupPlaceRankingWriter.class);
+    private DataSource dataSource;
     private HotPlaceStepsDataShareBean<Instaranking> dataShareBean;
-    private Map<String, Integer> countedPlacetags;
     private String hotplace;
+    private JdbcBatchItemWriter<Instaranking> delegate;
+    private static final String sql
+            = "INSERT INTO Instaranking(station, placetag, placetagCNT, likeCNT) " +
+                "values (:station, :placetag, :placetagCNT, :likeCNT)";
 
 
     SetupPlaceRankingWriter() {}
 
     @Autowired
-    public SetupPlaceRankingWriter(HotPlaceStepsDataShareBean<Instaranking> dataShareBean) {
+    public SetupPlaceRankingWriter(DataSource dataSource, HotPlaceStepsDataShareBean<Instaranking> dataShareBean) {
+        this.dataSource = dataSource;
         this.dataShareBean = dataShareBean;
     }
 
+    @BeforeStep
+    public void prepareForUpdate() {
+        this.delegate = new JdbcBatchItemWriter<>();
+        this.delegate.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Instaranking>());
+        this.delegate.setDataSource(this.dataSource);
+        this.delegate.setJdbcTemplate(new NamedParameterJdbcTemplate(this.dataSource));
+        this.delegate.setSql(sql);
+        this.delegate.afterPropertiesSet();
+    }
+
     @Override
-    public void write(List<? extends List<Instaranking>> objects) {
+    public void write(List<? extends List<Instaranking>> objects) throws Exception {
         logger.info("[FindHotPlaceJob] : SetupPlaceRanking-ItemWriter started.");
-        Map<String, Long> hasSameCount = new HashMap<>();
-        Map.Entry<String, Integer> maxEntry = null;
-        countedPlacetags = dataShareBean.getCountingTags();
 
-        for(Map.Entry<String, Integer> entry : countedPlacetags.entrySet()) {
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue());
+        List<Instaranking> objectList = new ArrayList<>();
+        for(List<Instaranking> object : objects) {
+            objectList.addAll(object);
+        }
 
-            if(maxEntry == null
-                || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+        this.delegate.write(objectList);
 
-                maxEntry = entry;
-                hasSameCount.clear();
-                System.out.println("최대 : " + maxEntry.getKey());
-            }
-            else if(entry.getValue().compareTo(maxEntry.getValue()) == 0) {
-                if(hasSameCount.size() == 0) {
-                    hasSameCount.put(maxEntry.getKey(), (long) 0);
+        setHotplacePerStation(objectList);
+    }
+
+    private void setHotplacePerStation(List<Instaranking> objectList) {
+        String hotplace = "";
+        long max = 0;
+        boolean marked = false;
+
+        for(Instaranking object : objectList) {
+            System.out.println(object.getPlacetag());
+            System.out.println(object.getPlacetagCNT());
+            System.out.println(object.getLikeCNT());
+
+            if(max == 0
+                    || object.getPlacetagCNT() > max) {
+
+                if(! object.getPlacetag().equals(object.getStation())
+                    || ! object.getPlacetag().equals(object.getStation() + "역")) {
+
+                    marked = false;
+                    max = object.getPlacetagCNT();
+                    hotplace = object.getPlacetag();
+                    System.out.println("핫플 : " + hotplace);
                 }
-
-                hasSameCount.put(entry.getKey(), (long) 0);
+            }
+            else if(object.getPlacetagCNT() == max) {
+                marked = true;
             }
         }
 
-        if(hasSameCount.size() == 0 && maxEntry != null) {
-            hotplace = maxEntry.getKey();
+        if(marked) { // 동점인게 있음.
+            hotplace = computeForHotplace(objectList, max);
         }
-        else { //동점인 게 있음 -> likeCNT 다 더하기
-            hotplace = computeForHotplace(objects.get(0), hasSameCount);
-        }
+
         System.out.println(hotplace);
 
         try {
-            dataShareBean.putHotplacePerStation(objects.get(0).get(0).getStation(), hotplace);
+            dataShareBean.putHotplacePerStation(objectList.get(0).getStation(), hotplace);
 
         } catch(IndexOutOfBoundsException e) { }
-
-        dataShareBean.setCountingTagsEmpty();
+        System.out.println("역 별 핫플 목록 : " + dataShareBean.getHotplacePerStation());
     }
 
-    private String computeForHotplace(List<Instaranking> objects, Map<String, Long> placetags) {
+    private String computeForHotplace(List<Instaranking> objectList, long maxTags) {
         String hotplace = "";
-        Set<String> keyset = null;
         long maxLikes = -1;
 
-        for(Instaranking instaranking : objects) {
+        for(Instaranking instaranking : objectList) {
             if(instaranking.getPlacetag() == null)
                 continue;
 
-            placetags.computeIfPresent(instaranking.getPlacetag(),
-                    (String key, Long value) ->
-                                            value += instaranking.getLikeCNT());
-        }
+            if(instaranking.getPlacetagCNT() == maxTags
+                && (! instaranking.getPlacetag().equals(instaranking.getStation())
+                    || ! instaranking.getPlacetag().equals(instaranking.getStation() + "역"))) {
 
-        keyset = placetags.keySet();
+                maxLikes = (instaranking.getLikeCNT() > maxLikes) ?
+                                            instaranking.getLikeCNT() : maxLikes;
 
-        for(String placetag : keyset) {
-            if(placetags.get(placetag) > maxLikes) {
-                maxLikes = placetags.get(placetag);
-                hotplace = placetag;
+                if(maxLikes == instaranking.getLikeCNT()) {
+                    hotplace = instaranking.getPlacetag();
+                }
             }
         }
 

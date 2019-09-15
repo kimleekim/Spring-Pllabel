@@ -54,7 +54,9 @@ public class SetupPlaceRankingReader implements ItemReader<Instaranking>, ItemSt
         logger.info("[FindHotPlaceJob] : SetupPlaceRanking-ItemReader started.");
 
         instaranking = new Instaranking();
-        result = Objects.requireNonNull(delegate.read()).getStation();
+        Overall overall = delegate.read();
+        if (overall != null)
+            result = overall.getStation();
 
         System.out.println(result);
         dataShareBean.addStation(result);
@@ -67,7 +69,8 @@ public class SetupPlaceRankingReader implements ItemReader<Instaranking>, ItemSt
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         try {
             this.delegate.open(executionContext);
-        } catch(IllegalStateException e) {
+        } catch(IllegalStateException
+                | ItemStreamException e) {
             delegate.close();
             delegate.open(executionContext);
         }

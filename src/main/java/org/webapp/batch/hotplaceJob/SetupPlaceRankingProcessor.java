@@ -47,7 +47,6 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
         } catch (Exception e) {
             logger.error("Check your chrome-WebDriver location in local.");
         }
-        System.out.println(this.webDriver);
     }
 
     @Override
@@ -57,7 +56,9 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
         List<Instaranking> objectList = new ArrayList<>();
         String station;
         String placetag = "";
+        long likeCnt = 0;
         Date limitDate = null;
+        int chance = 0;
         ZoneId zid = ZoneId.of("Asia/Seoul");
         ZonedDateTime threeMonthsAgo = ZonedDateTime
                                         .now()
@@ -65,19 +66,22 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
                                         .minusMonths(1);
         int index = 1;
         List<String> photolinks = new ArrayList<String>();
+        Map<String, Integer> countingTags = new HashMap<>();
+        Map<String, Long> countingLikes = new HashMap<>();
         station = instaranking.getStation();
 
-        dataShareBean.setCountingTagsEmpty();
         getReadyForCrawling(station);
 
         while(true) {
 
-            if(index == 1)
+            if(index == 1) {
                 index = this.instaCrawlImpl.waitPage(this.webDriver, 1, 9); //4
+            }
             else {
                 // if last page
-                if (instaCrawlImpl.waitPage(webDriver, 2, 0) == 3) // 다음 버튼 클릭
+                if (instaCrawlImpl.waitPage(webDriver, 2, 0) == 3) { // 다음 버튼 클릭
                     break;
+                }
             }
 
             limitDate = instaCrawlImpl.getDate(this.webDriver);
@@ -87,32 +91,77 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
             if(limitDate != null
                     && limitDate.equals(Date.valueOf(threeMonthsAgo.toLocalDate()))) {
 
-                break;
+                if(chance < 5) {
+                    chance ++;
+                    continue;
+                }
+                else if(chance == 5) {
+                    break;
+                }
+
             } else if(limitDate != null
                     && limitDate.before(Date.valueOf(threeMonthsAgo.toLocalDate()))) {
 
-                if(limitDate.equals(Date.valueOf("1970-01-01"))) {
-                    System.out.println("여기 걸림");
+                if(limitDate.toString().equals("1970-01-01")) {
                     continue;
                 }
-                break;
+                else if(chance < 5) {
+                    chance ++;
+                    continue;
+                }
+                else if(chance == 5) {
+                    break;
+                }
+
             }
+
+            chance = 0;
 
             placetag = instaCrawlImpl.getPlacetag(this.webDriver);
             if(! placetag.equals("")) {
                 System.out.println(placetag);
-                instaranking.setPlacetag(placetag);
-                dataShareBean.countPlaceTag(placetag);
+
+                countingTags.computeIfPresent(placetag,
+                        (String key, Integer value) -> ++value);
+                countingTags.putIfAbsent(placetag, 1);
+
+                likeCnt = instaCrawlImpl.getLikeCNT(this.webDriver);
+                long finalLikeCnt = likeCnt;
+                System.out.println("좋아요수 : " + finalLikeCnt);
+
+                countingLikes.computeIfPresent(placetag,
+                        (String key, Long value) -> value += finalLikeCnt);
+                countingLikes.putIfAbsent(placetag, finalLikeCnt);
             }
-            instaranking.setLikeCNT(instaCrawlImpl.getLikeCNT(this.webDriver));
-            System.out.println(instaCrawlImpl.getLikeCNT(this.webDriver));
 
             photolinks.add(instaCrawlImpl.getPhotopageURL(this.webDriver));
-
-            objectList.add(instaranking);
         }
 
-        dataShareBean.putPhotoPagelinks(instaCrawlImpl.getIsFoodpost(), photolinks);
+        objectList = setObjectList(station, countingTags, countingLikes, objectList);
+
+        dataShareBean.putFoodPhotoPagelinks(instaCrawlImpl.getIsFoodpost(), photolinks);
+
+        return objectList;
+    }
+
+    private List<Instaranking> setObjectList(String station,
+                                             Map<String, Integer> countingTags,
+                                             Map<String, Long> countingLikes,
+                                             List<Instaranking> objectList) {
+
+        Instaranking object;
+        Set<String> keyset = countingTags.keySet();
+
+        for(String placetag : keyset) {
+            object = new Instaranking();
+            object.setStation(station);
+            object.setPlacetag(placetag);
+            object.setPlacetagCNT(countingTags.get(placetag));
+            object.setLikeCNT(countingLikes.get(placetag));
+
+            objectList.add(object);
+        }
+
         return objectList;
     }
 

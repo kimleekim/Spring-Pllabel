@@ -138,6 +138,7 @@ public class InstaCrawlImpl implements InstaCrawl {
                 break;
             } catch (TimeoutException e) {
                 logger.info("Loading Image Now ...");
+                webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(findWebElement));
 
                 if (isNormal) {
                     isNormal = false;
