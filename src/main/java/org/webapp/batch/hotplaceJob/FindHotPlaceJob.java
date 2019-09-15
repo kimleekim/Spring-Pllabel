@@ -4,30 +4,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.*;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.webapp.batch.BatchSettings;
 import org.webapp.model.Instaranking;
-import org.webapp.model.Overall;
-
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Set;
 
 
 @Configuration(value = "GetHotPlaceJobBean")
 @EnableBatchProcessing
 public class FindHotPlaceJob {
     private static final String JOB_NAME = "findHotPlace-Job";
+    private static final String SETTING_STEP_NAME = "resetInstaranking-Step";
     private static final String FIRST_STEP_NAME = "setupPlaceRanking-Step";
     private static final String SECOND_STEP_NAME = "setupHotPlaceResult-Step";
     private static final int CHUNK_SIZE = 1;
@@ -37,6 +38,7 @@ public class FindHotPlaceJob {
     private StepBuilderFactory stepBuilderFactory;
     private DataSource dataSource;
     private DataSourceTransactionManager transactionManager;
+    private JdbcTemplate jdbcTemplate;
 
     FindHotPlaceJob() {}
 
@@ -50,6 +52,7 @@ public class FindHotPlaceJob {
         this.stepBuilderFactory = stepBuilderFactory;
         this.dataSource = dataSource;
         this.transactionManager = transactionManager;
+        this.jdbcTemplate = new JdbcTemplate(this.dataSource);
     }
 
     @Bean
@@ -72,9 +75,27 @@ public class FindHotPlaceJob {
     @Bean
     public Job findHotPlaceJob() {
         return jobBuilderFactory.get(JOB_NAME)
-                .start(setupPlaceRankingStep())
+                .start(resetInstarankingStep())
+                .next(setupPlaceRankingStep())
                 //.next(setupHotPlaceResultStep())
                 .build();
+    }
+
+    @Bean
+    @JobScope
+    public Step resetInstarankingStep() {
+        return stepBuilderFactory.get(SETTING_STEP_NAME)
+                .tasklet(new Tasklet() {
+
+                    @Override
+                    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+                        logger.info("[FindHotPlaceJob] : ResetInstaranking-Tasklet started.");
+                        String sql = "DELETE FROM Instaranking";
+                        jdbcTemplate.update(sql);
+                        return RepeatStatus.FINISHED;
+
+                    }
+                }).build();
     }
 
     @Bean

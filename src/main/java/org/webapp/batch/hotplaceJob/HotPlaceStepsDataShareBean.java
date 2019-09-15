@@ -13,13 +13,11 @@ public class HotPlaceStepsDataShareBean<T> {
 
     private List<String> stations = null;
     private Map<Integer, List<String>> photoPagelinks;
-    private Map<String, Integer> countingTags = null;
     private Map<String, String> hotplacePerStation = null;
 
     public HotPlaceStepsDataShareBean() {
         this.stations = new ArrayList<>();
         this.photoPagelinks = null;
-        this.countingTags = new HashMap<>();
         this.hotplacePerStation = new HashMap<>();
     }
 
@@ -34,7 +32,7 @@ public class HotPlaceStepsDataShareBean<T> {
         }
     }
 
-    public void putPhotoPagelinks(int isFoodPost, List<String> links) {
+    public void putFoodPhotoPagelinks(int isFoodPost, List<String> links) {
         if(photoPagelinks == null) {
             photoPagelinks = Collections.singletonMap(isFoodPost, links);
 
@@ -44,21 +42,6 @@ public class HotPlaceStepsDataShareBean<T> {
         }
     }
 
-    public void setCountingTagsEmpty() {
-        this.countingTags = new HashMap<>();
-    }
-
-    public void countPlaceTag(String placetag) {
-        if(countingTags == null) {
-            logger.error("countingTags-Map is not initialized.");
-            return;
-        }
-
-        countingTags.computeIfPresent(placetag,
-                (String key, Integer value) -> ++value);
-
-        countingTags.putIfAbsent(placetag, 1);
-    }
 
     public void putHotplacePerStation(String station, String hotplace) {
         if(hotplacePerStation == null) {
@@ -89,15 +72,6 @@ public class HotPlaceStepsDataShareBean<T> {
         }
 
         return photoPagelinks;
-    }
-
-    public Map<String, Integer> getCountingTags() {
-        if(countingTags == null) {
-            logger.error("countingTags-Map is not initialized.");
-            return null;
-        }
-
-        return countingTags;
     }
 
     public Map<String, String> getHotplacePerStation() {
