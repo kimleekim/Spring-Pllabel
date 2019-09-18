@@ -21,7 +21,7 @@ public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetupPlaceRankingWriter.class);
     private DataSource dataSource;
-    private HotPlaceStepsDataShareBean<Instaranking> dataShareBean;
+    private HotPlaceStepsDataShareBean dataShareBean;
     private String hotplace;
     private JdbcBatchItemWriter<Instaranking> delegate;
     private static final String sql
@@ -32,7 +32,7 @@ public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
     SetupPlaceRankingWriter() {}
 
     @Autowired
-    public SetupPlaceRankingWriter(DataSource dataSource, HotPlaceStepsDataShareBean<Instaranking> dataShareBean) {
+    public SetupPlaceRankingWriter(DataSource dataSource, HotPlaceStepsDataShareBean dataShareBean) {
         this.dataSource = dataSource;
         this.dataShareBean = dataShareBean;
     }

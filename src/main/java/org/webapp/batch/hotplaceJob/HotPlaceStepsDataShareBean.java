@@ -8,7 +8,7 @@ import org.webapp.dataset.InstaCrawl;
 import java.util.*;
 
 @Component
-public class HotPlaceStepsDataShareBean<T> {
+public class HotPlaceStepsDataShareBean {
     private static final Logger logger = LoggerFactory.getLogger(HotPlaceStepsDataShareBean.class);
 
     private List<String> stations = null;

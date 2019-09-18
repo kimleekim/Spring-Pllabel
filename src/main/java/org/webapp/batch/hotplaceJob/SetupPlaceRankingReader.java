@@ -17,12 +17,12 @@ import java.util.Objects;
 
 
 @StepScope
-public class SetupPlaceRankingReader implements ItemReader<Instaranking>, ItemStream {
+public class SetupPlaceRankingReader implements ItemReader<Overall> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetupPlaceRankingReader.class);
     private int chunkSize;
     private DataSource dataSource;
-    private HotPlaceStepsDataShareBean<Instaranking> dataShareBean;
+    private HotPlaceStepsDataShareBean dataShareBean;
     private JdbcCursorItemReader<Overall> delegate;
     private static final String query = "SELECT STATION FROM OVERALL";
     private String result;
@@ -50,39 +50,42 @@ public class SetupPlaceRankingReader implements ItemReader<Instaranking>, ItemSt
     }
 
     @Override
-    public Instaranking read() throws Exception{
+    public Overall read() throws Exception{
         logger.info("[FindHotPlaceJob] : SetupPlaceRanking-ItemReader started.");
 
-        instaranking = new Instaranking();
-        Overall overall = delegate.read();
-        if (overall != null)
-            result = overall.getStation();
-
-        System.out.println(result);
-        dataShareBean.addStation(result);
-        instaranking.setStation(result);
-
-        return instaranking;
+//        instaranking = new Instaranking();
+//        Overall overall = delegate.read();
+//        if (overall != null)
+//            result = overall.getStation();
+//
+//        System.out.println(result);
+//        dataShareBean.addStation(result);
+//        instaranking.setStation(result);
+//
+//        return instaranking;
+        return delegate.read();
     }
 
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        try {
-            this.delegate.open(executionContext);
-        } catch(IllegalStateException
-                | ItemStreamException e) {
-            delegate.close();
-            delegate.open(executionContext);
-        }
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        this.delegate.update(executionContext);
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-        this.delegate.close();
-    }
+//
+//    @Override
+//    public void open(ExecutionContext executionContext) throws ItemStreamException {
+////        try {
+////            this.delegate.open(executionContext);
+////        } catch(IllegalStateException
+////                | ItemStreamException e) {
+////            delegate.close();
+////            delegate.open(executionContext);
+////        }
+//        this.delegate.open(executionContext);
+//    }
+//
+//    @Override
+//    public void update(ExecutionContext executionContext) throws ItemStreamException {
+//        this.delegate.update(executionContext);
+//    }
+//
+//    @Override
+//    public void close() throws ItemStreamException {
+//        this.delegate.close();
+//    }
 }

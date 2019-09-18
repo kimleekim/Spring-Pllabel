@@ -64,9 +64,9 @@ public class BatchConfiguration {
     @Bean
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setQueueCapacity(30);
+        taskExecutor.setQueueCapacity(1);
         taskExecutor.setCorePoolSize(1);
-        taskExecutor.setMaxPoolSize(8);
+        taskExecutor.setMaxPoolSize(1);
         return taskExecutor;
     }
 
