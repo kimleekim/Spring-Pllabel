@@ -1,6 +1,7 @@
 package org.webapp.dataset;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -9,16 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.webapp.config.ChromeDriverContext;
-
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Component
 public class InstaCrawlImpl implements InstaCrawl {
     private static final Logger logger = LoggerFactory.getLogger(InstaCrawlImpl.class);
+
     @Autowired
     S3Connector s3Connector;
 
@@ -37,7 +39,6 @@ public class InstaCrawlImpl implements InstaCrawl {
     private List<WebElement> replyList;
     private String replycheck;
     private int isFoodpost = 0;
-    private int totalPostCount = 0;
     private int limitPostatOnce = 180;
 
     final int goTargetpost = 1;
@@ -67,9 +68,50 @@ public class InstaCrawlImpl implements InstaCrawl {
         return this.isFoodpost;
     }
 
+    private void checkLogin(String search) throws InterruptedException {
+        By locator;
+
+        String url = this.driver.getCurrentUrl();
+        System.out.println(search);
+        System.out.println(url);
+
+        if(!search.equals(url) && url.contains("login")) {
+
+            locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(2) > div > label > input");
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
+
+            driver.findElement(locator).sendKeys("projectt452");
+            System.out.println(driver.findElement(locator).getAttribute("name"));
+            locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(3) > div > label > input");
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
+
+            driver.findElement(locator).sendKeys("project123");
+            System.out.println(driver.findElement(locator).getAttribute("name"));
+
+            driver.findElement(locator).sendKeys(Keys.ENTER);
+            driver.findElement(locator).submit();
+
+            try {
+                webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"react-root\"]/section/main/article/header/div[2]/h1")));
+            }
+            catch(TimeoutException e) {
+
+                if(driver.getCurrentUrl().contains("login")) {
+                    driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/article/div/div[1]/div/form/div[4]/button")).click();
+                    webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"react-root\"]/section/main/article/header/div[2]/h1")));
+                } else {
+                    Thread.sleep(10000);
+                }
+
+            }
+
+
+        }
+    }
+
     @Override
     public WebDriver setUpWebDriver (String search, String station) throws Exception {
-        //초기 드라이버 셋팅
+
         if (search.contains(station)) { isFoodpost = 1; }
         else { isFoodpost = 2; }
 
@@ -77,34 +119,135 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.webDriverWait = new WebDriverWait(this.driver, 40);
         driver.manage().window().maximize();
         this.skipPopularposts = 9;
+
+        String currentUrl = driver.getCurrentUrl();
+
         driver.get(search);
 
+        webDriverWait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(currentUrl)));
+
+        checkLogin(search);
+
         try {
-            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/header/div[2]/div/div[2]/span/span");
+            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/article/div[1]/h2/div");
             webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(findWebElement));
-            this.element = driver.findElement(findWebElement);
-            totalPostCount = Integer.parseInt(element.getText().replaceAll("\\,", ""));
-            System.out.println("total: " + totalPostCount);
+
         } catch (TimeoutException e) {
-            logger.info("FAIL to get Total-posts-Count.");
+            logger.info("FAIL to get Location.");
             refreshPage(driver);
         }
 
         return driver;
     }
 
+    @Override
+    public String setUpWebDriverForLocation(String tempUrl, String keyword) throws Exception {
+        List<WebElement> getSearch;
+        WebElement search = null;
+        String url = "";
+
+        this.driver = driverContext.setupChromeDriver();
+        this.webDriverWait = new WebDriverWait(this.driver, 40);
+        driver.manage().window().maximize();
+        driver.get(tempUrl);
+
+        try {
+            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/input");
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(this.findWebElement));
+            this.element = driver.findElement(this.findWebElement);
+
+            this.element.clear();
+            this.element.sendKeys(keyword);
+
+            webDriverWait.until(ExpectedConditions.textToBePresentInElementValue(this.findWebElement, keyword));
+
+        } catch(TimeoutException e) {
+            this.element = driver.findElement(this.findWebElement);
+
+            this.element.clear();
+            this.element.sendKeys(keyword);
+
+            webDriverWait.until(new ExpectedCondition<Boolean>() {
+
+                        public Boolean apply(WebDriver driver) {
+                            WebElement webElement
+                                    = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/input"));
+                            String check = webElement.getAttribute("value");
+
+                            if(check.equals(keyword))
+                                return true;
+                            else
+                                return false;
+                        }
+
+                                });
+
+        }
+
+        webDriverWait.until(new ExpectedCondition<Boolean>() {
+
+            public Boolean apply(WebDriver driver) {
+                By by = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[3]");
+                String check = driver.findElement(by).getAttribute("class");
+
+                return check.equals("aIYm8 coreSpriteSearchClear");
+            }
+        });
+
+        try {
+            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div");
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(this.findWebElement));
+
+        } catch(NoSuchElementException
+                | TimeoutException e) {
+
+            try {
+                this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a[1]");
+                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(this.findWebElement));
+            } catch(NoSuchElementException e2) {
+                this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a");
+                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(this.findWebElement));
+            }
+
+        }
+
+        webDriverWait.until(ExpectedConditions.elementToBeClickable(this.findWebElement));
+
+        getSearch = driver.findElements(By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a"));
+
+        for(WebElement block : getSearch) {
+            if(block.findElement(By.xpath(".//div/div[1]")).getAttribute("class").equals("nebtz coreSpriteLocation")
+                    && block.findElement(By.xpath(".//div/div[2]/div/span")).getText().equals(keyword)) {
+
+                search = block;
+                break;
+            }
+        }
+
+        if (search != null) {
+            url = search.getAttribute("href");
+        }
+        else
+            return "";
+
+        return url;
+    }
+
     private void refreshPage (WebDriver driver) {
         this.driver = driver;
         driver.navigate().refresh();
         this.findWebElement = By.cssSelector("#react-root > svg");
+
         while (true) {
+
             try {
                 webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(findWebElement));
                 break;
             } catch (TimeoutException e) {
-                System.out.println("페이지 새로고침 후 로드 실패!");
+                logger.error("페이지 새로고침 후 로드 실패!");
                 continue;
             }
+
         }
     }
 
@@ -132,10 +275,12 @@ public class InstaCrawlImpl implements InstaCrawl {
         boolean isNormal = true;
 
         while (true) {
+
             try {
                 webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(findWebElement));
                 isNormal = true;
                 break;
+
             } catch (TimeoutException e) {
                 logger.info("Loading Image Now ...");
                 webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(findWebElement));
@@ -146,7 +291,9 @@ public class InstaCrawlImpl implements InstaCrawl {
                 else {
                     break;
                 }
+
             }
+
         }
         return isNormal;
     }
@@ -170,28 +317,33 @@ public class InstaCrawlImpl implements InstaCrawl {
             try {
                 element = driver.findElement(by);
                 executor = (JavascriptExecutor)driver;
+
                 executor.executeScript("arguments[0].click();", element);
                 break;
             } catch(ElementClickInterceptedException
                     | NoSuchElementException
                     | StaleElementReferenceException e) {
+
                 try {
                     webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
                 } catch(TimeoutException exception) {
                     continue;
                 }
+
             }
         }
     }
 
     private int moveTargetPost(WebDriver driver, int skipPosts) {
         this.driver = driver;
+        System.out.println(this.driver);
 
         try {
 
             while (true) {
                 this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/article/div[1]/div/div/div[1]/div[1]/a");
                 webDriverWait.until(ExpectedConditions.elementToBeClickable(findWebElement));
+
                 retryingFindClick(findWebElement);
                 if (!waitImageLoad(driver)) { closePost(driver); refreshPage(driver); }
                 else { break; }
@@ -205,14 +357,13 @@ public class InstaCrawlImpl implements InstaCrawl {
             return noExceptionOccur;
 
         } catch (TimeoutException e) {
-            //System.out.println("첫번째 게시물 안 눌림!");
             refreshPage(driver);
             return exceptionOccur;
         }
     }
 
     private boolean clickNextButton(WebDriver driver) {
-        //다음 버튼 누르기
+
         this.driver = driver;
         boolean doesNextExist = false;
 
@@ -231,9 +382,7 @@ public class InstaCrawlImpl implements InstaCrawl {
             doesNextExist = false;
 
         } catch (TimeoutException e) {
-
             logger.info("FAIL to load next Page.");
-
         }
         //새로운 검색어 넣는 작업 필요 (리턴값이 false면)
         return doesNextExist;
@@ -251,11 +400,20 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.driver = driver;
         String realdate = "";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM dd, yyyy");
-        By by = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[2]/a/time");;
+        By by = By.cssSelector("body > div._2dDPU.vCf6V > div.zZYga > div > article > div.eo2As > div.k_Q0X.NnvRN > a > time");;
 
         try {
-            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+
+            try {
+                webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+            } catch(TimeoutException e) {
+                logger.error("TimeoutException in <getDate>");
+                Thread.sleep(10000);
+            }
+            System.out.println(driver.findElement(By.xpath("/html/body/div[3]/div[2]/div/article/header/div[2]/div[1]/div[1]/h2/a")).getText());
+
             this.element = driver.findElement(by);
+
             realdate = element.getAttribute("title");
 
         } catch (NoSuchElementException one_more_try) {
@@ -269,6 +427,7 @@ public class InstaCrawlImpl implements InstaCrawl {
             }
 
         } catch (NullPointerException e) {
+
             realdate = "";
 
         } finally {
@@ -342,23 +501,34 @@ public class InstaCrawlImpl implements InstaCrawl {
     public String getPost(WebDriver driver) {
         this.driver = driver;
         String post = "";
+        By locator;
 
         try {
 
-            webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[1]/span[1]/button"))));
-            this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
+            locator = By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span");
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+
+            this.element = driver.findElement(locator);
             post = element.getText();
 
-        } catch (NoSuchElementException one_more_try) {
+        } catch (NoSuchElementException
+                | TimeoutException one_more_try) {
+
+            logger.info("Has Exception in post crawling.");
 
             try {
-                this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
+                Thread.sleep(10000);
+                this.element
+                        = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span"));
                 post = element.getText();
+
             } catch (NoSuchElementException no_post_exist) {
+
                 post = "";
             }
 
         } catch (NullPointerException e) {
+            logger.error("Cannot load your web Driver.");
             post = "";
         } finally {
             return post;
@@ -485,10 +655,10 @@ public class InstaCrawlImpl implements InstaCrawl {
         while (true) {
             try {
                 String description = getDescription(driver, index);
-                System.out.println(description);
+
                 if (isFoodpost == 1
                         && description != null
-                        && (description.contains("food") || description.contains("음식"))) {
+                        && (description.contains("food"))) {
 
                     photoURL = getPhotoSRC(driver, index);
                     break;
@@ -496,7 +666,7 @@ public class InstaCrawlImpl implements InstaCrawl {
                 }
                 else if (isFoodpost == 2
                         && description != null
-                        && ((description.contains("indoor") || description.contains("outdoor") || description.contains("실내") || description.contains("실외")))) {
+                        && ((description.contains("indoor") || description.contains("outdoor")))) {
 
                     photoURL = getPhotoSRC(driver, index);
                     break;
@@ -549,7 +719,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         }
 
         if (!(photoURL.equals(""))) {
-            MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, url);
+            MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, url.substring(14, 19));
             return s3Connector.upload(multipartFile, "static");
         }
         else {
@@ -559,53 +729,30 @@ public class InstaCrawlImpl implements InstaCrawl {
     }
 
     private WebElement setPhotoURLElement(WebDriver driver, int index) {
-        //getDescription, getPhotoURL에서 포스팅 사진 태그를 읽어들이기 위한 공통적인 사전작업
+
         this.driver = driver;
+
         try {
-            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/button");
-            webDriverWait.until(ExpectedConditions.elementToBeClickable(findWebElement));
+
+            this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[1]/a/div/div[2]/span");
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(findWebElement));
+            this.element = driver.findElement(By.className("FFVAD"));
+
+        } catch (TimeoutException e) {
 
             try {
-                if (index == 1) {
-                    try {
-                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li[1]/div/div/div/div[1]/img"));
-                    } catch (NoSuchElementException have_friend_tag) {
-                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li[1]/div/div/div/div[1]/div[1]/img"));
-                    }
-                }
-                else {
-                    try {
-                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
-                                + index + "]/div/div/div/div/div[1]/img"));
-                    } catch (NoSuchElementException have_friend_tag) {
-                        this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
-                                + index + "]/div/div/div/div/div[1]/div[1]/img"));
-                    }
-                }
-            } catch (NoSuchElementException have_friend_tag) {
-                try {
-                    this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div/div[2]/div/div/div/ul/li["
-                            + index + "]/div/div/div/div/div[1]/div[1]/img"));
-                } catch (NoSuchElementException no_image_exist) {
-                    this.element = null;
-                }
-            }
-        } catch (NoSuchElementException post_has_one_photo) {
-            try {
-                this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div[1]/img"));
-            } catch (NoSuchElementException have_friend_tag) {
-                try {
-                    this.element = driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[1]/div/div/div[1]/div[1]/img"));
-                } catch (NoSuchElementException no_image_exist) {
-                    this.element = null;
-                }
+                System.out.println("setPhotoURLElement timeout occur!!");
+                this.element = driver.findElement(By.className("FFVAD"));
+            } catch (NoSuchElementException ee) {
+                this.element = null;
             }
         }
+
         return element;
     }
 
     private String getPhotoSRC (WebDriver driver, int index) {
-        //aws에 저장할 포스팅 사진의 src값 얻어오는 작업
+
         this.driver = driver;
         String photoSRC = "";
         try {
@@ -614,7 +761,7 @@ public class InstaCrawlImpl implements InstaCrawl {
                 photoSRC = element.getAttribute("srcset");
             }
             else {
-                System.out.println("element null!!");
+                logger.error("photoUrl element is null.");
             }
         } catch (NoSuchElementException one_more_try) {
             try {
@@ -639,8 +786,19 @@ public class InstaCrawlImpl implements InstaCrawl {
             findHashtags(posts, hashtags);
 
         this.driver = driver;
-        this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/h2/a"));
+        this.findWebElement = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/h2/a");
+
+        try {
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(findWebElement));
+        } catch (TimeoutException
+                | NoSuchElementException e) {
+
+            return hashtags;
+        }
+
+        this.element = driver.findElement(findWebElement);
         username = element.getText();
+
         while(true) {
             try{
                 this.findWebElement = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/li/div/button");
@@ -669,7 +827,7 @@ public class InstaCrawlImpl implements InstaCrawl {
                     while (true) {
                         this.element = nthComment.findElement(By.xpath(".//li/ul/li/div/button"));
 
-                        if(this.element.findElement(By.xpath(".//span")).getText().equals("답글 숨기기"))
+                        if(this.element.findElement(By.xpath(".//span")).getText().equals("Hide replies"))
                             break;
 
                         this.element.click();

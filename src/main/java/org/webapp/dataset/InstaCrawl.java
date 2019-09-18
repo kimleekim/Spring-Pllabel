@@ -11,6 +11,8 @@ import java.util.List;
 public interface InstaCrawl {
     public WebDriver setUpWebDriver(String searchKeyword, String station) throws Exception;
 
+    public String setUpWebDriverForLocation(String tempUrl, String keyword) throws Exception;
+
     public int waitPage(WebDriver driver, int position, int skipPosts);
 
     public boolean checkPoint(int storedPosts);
