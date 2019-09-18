@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.webapp.dataset.InstaCrawl;
 import org.webapp.dataset.InstaCrawlImpl;
 import org.webapp.model.Instaranking;
+import org.webapp.model.Overall;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -21,10 +22,10 @@ import java.util.*;
 
 @Component
 @StepScope
-public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, List<Instaranking>> {
+public class SetupPlaceRankingProcessor implements ItemProcessor<Overall, List<Instaranking>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetupPlaceRankingProcessor.class);
-    private HotPlaceStepsDataShareBean<Instaranking> dataShareBean;
+    private HotPlaceStepsDataShareBean dataShareBean;
     private InstaCrawlImpl instaCrawlImpl;
     private WebDriver webDriver;
     private static String url = "https://www.instagram.com/explore/tags/";
@@ -34,7 +35,7 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
     SetupPlaceRankingProcessor() {}
 
     @Autowired
-    public SetupPlaceRankingProcessor(HotPlaceStepsDataShareBean<Instaranking> dataShareBean,
+    public SetupPlaceRankingProcessor(HotPlaceStepsDataShareBean dataShareBean,
                                       InstaCrawlImpl instaCrawlImpl) {
         this.dataShareBean = dataShareBean;
         this.instaCrawlImpl = instaCrawlImpl;
@@ -43,14 +44,15 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
     private void getReadyForCrawling(String station) {
         countingTags = new HashMap<>();
         try {
-            this.webDriver = this.instaCrawlImpl.setUpWebDriver(this.url + station, station);
+            this.webDriver = this.instaCrawlImpl.setUpWebDriver(url + station, station);
         } catch (Exception e) {
             logger.error("Check your chrome-WebDriver location in local.");
         }
+        System.out.println(this.webDriver + "받아옴");
     }
 
     @Override
-    public List<Instaranking> process(Instaranking instaranking) throws ParseException {
+    public List<Instaranking> process(Overall overall) throws ParseException {
         logger.info("[FindHotPlaceJob] : SetupPlaceRanking-ItemProcessor started.");
 
         List<Instaranking> objectList = new ArrayList<>();
@@ -63,12 +65,12 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Instaranking, L
         ZonedDateTime threeMonthsAgo = ZonedDateTime
                                         .now()
                                         .withZoneSameInstant(zid)
-                                        .minusMonths(1);
+                                        .minusWeeks(1);
         int index = 1;
         List<String> photolinks = new ArrayList<String>();
         Map<String, Integer> countingTags = new HashMap<>();
         Map<String, Long> countingLikes = new HashMap<>();
-        station = instaranking.getStation();
+        station = overall.getStation();
 
         getReadyForCrawling(station);
 
