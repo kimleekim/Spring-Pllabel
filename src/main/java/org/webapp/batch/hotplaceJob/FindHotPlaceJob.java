@@ -29,6 +29,7 @@ import org.webapp.batch.BatchSettings;
 import org.webapp.model.Instahot;
 import org.webapp.model.Instaranking;
 import org.webapp.model.Overall;
+import org.webapp.model.Youtubehot;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -43,6 +44,7 @@ public class FindHotPlaceJob {
     private static final String SETTING_STEP_NAME = "resetInstaranking-Step";
     private static final String FIRST_STEP_NAME = "setupPlaceRanking-Step";
     private static final String SECOND_STEP_NAME = "setupInstaHotPlace-Step";
+    private static final String THIRD_STEP_NAME = "setupYoutubeHotPlace-Step";
     private static final int CHUNK_SIZE = 1;
     private static final Logger logger = LoggerFactory.getLogger(FindHotPlaceJob.class);
 
@@ -97,6 +99,7 @@ public class FindHotPlaceJob {
                 .start(resetInstarankingStep())
                 .next(setupPlaceRankingStep())
                 .next(setupInstaHotPlaceStep())
+                .next(setupYoutubeHotPlaceStep())
                 .build();
     }
 
@@ -180,9 +183,27 @@ public class FindHotPlaceJob {
         return new SetupInstaHotPlaceWriter();
     }
 
+    @Bean
+    @JobScope
+    public Step setupYoutubeHotPlaceStep() {
+        return stepBuilderFactory.get(THIRD_STEP_NAME)
+                .<Map.Entry<String, String>, List<Youtubehot>>chunk(CHUNK_SIZE)
+                .reader(setupInstaHotPlaceReader())
+                .processor(setupYoutubeHotPlaceProcessor())
+                .writer(setupYoutubeHotPlaceWriter())
+                .transactionManager(this.transactionManager)
+                .build();
+    }
 
+    @Bean
+    public ItemProcessor<Map.Entry<String, String>, List<Youtubehot>> setupYoutubeHotPlaceProcessor() {
+        return new SetupYoutubeHotPlaceProcessor();
+    }
 
-
+    @Bean
+    public ItemWriter<List<Youtubehot>> setupYoutubeHotPlaceWriter() {
+        return new SetupYoutubeHotPlaceWriter();
+    }
 
     // 배치 비동기 처리 생각해보기 : ItemProcessor, ItemWriter -> 어떤 작업들에 비동기 걸어야 이득인지?
 //    @Bean

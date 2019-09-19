@@ -22,10 +22,9 @@ public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
     private static final Logger logger = LoggerFactory.getLogger(SetupPlaceRankingWriter.class);
     private DataSource dataSource;
     private HotPlaceStepsDataShareBean dataShareBean;
-    private String hotplace;
     private JdbcBatchItemWriter<Instaranking> delegate;
     private static final String sql
-            = "INSERT INTO Instaranking(station, placetag, placetagCNT, likeCNT) " +
+            = "INSERT INTO instaranking (station, placetag, placetagCNT, likeCNT) " +
                 "values (:station, :placetag, :placetagCNT, :likeCNT)";
 
 
