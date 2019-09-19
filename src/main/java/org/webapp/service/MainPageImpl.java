@@ -23,6 +23,8 @@ public class MainPageImpl implements MainPage {
     @Override
     public boolean isExistStation(String station) {
         Map<String, Object> input = new HashMap<>();
+
+        station = setStationframe(station);
         input.put("station", station);
         if (overallDao.findByParam(input).size() > 0) {
             Map<Object, String> addSearchCount = new LinkedHashMap<>();
@@ -49,7 +51,7 @@ public class MainPageImpl implements MainPage {
     }
 
     @Override
-    public String[] getTOP3Station() {
+    public List<String> getTOP3Station() {
         List<Overall> totalData = overallDao.findAll();
         List<String> stations = new ArrayList<>();
         Long[] top3 = {Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)};
@@ -78,7 +80,10 @@ public class MainPageImpl implements MainPage {
                 }
             }
         }
-        return top3Station;
+        for (int i = 0; i < 3; i++) {
+            stations.add(top3Station[i]);
+        }
+        return stations;
     }
 
     @Override

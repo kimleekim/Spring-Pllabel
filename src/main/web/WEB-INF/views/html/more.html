@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<head layout:fragment="content">
+    <meta charset="UTF-8">
+    <script src="/static/js/postFrame.js"></script>
+    <title>More post</title>
+</head>
+<body>
+<h1>더보기 페이지</h1>
+<input type="button" onclick="history.go(-1);" value="이전 화면으로">
+<div layout:fragment="content" id="container_morePost" style="border:0.2px solid gray">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var morepost = /*[[${morePost}]]*/;
+        /*]]>*/
+        for (i = 0; i < 4; i++) {   //4를 40으로
+            postFrame(i, morepost[i], 'container_morePost');
+        }
+    </script>
+</div>
+</body>
+</html>

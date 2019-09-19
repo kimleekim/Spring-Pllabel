@@ -48,6 +48,8 @@ dependencies {
     testCompile group: 'org.springframework.batch', name: 'spring-batch-test', version: '4.1.2.RELEASE'
     compile group: 'org.springframework', name: 'spring-mock', version: '2.0.8'
     compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.9.RELEASE'
+    compile group: 'org.thymeleaf', name: 'thymeleaf-spring5', version: '3.0.9.RELEASE'
 
 }
 

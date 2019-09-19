@@ -1,5 +1,6 @@
 package org.webapp.config;
 
+import org.apache.jasper.servlet.JspServlet;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.WebApplicationInitializer;
@@ -33,6 +34,10 @@ public class MyApplicationStarter implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(context));
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
+
+        ServletRegistration.Dynamic htmlServlet = servletContext.addServlet("htmlServlet", new JspServlet());
+        htmlServlet.setLoadOnStartup(2);
+        htmlServlet.addMapping("/");
 
         FilterRegistration charEncodingFilter = servletContext.addFilter("CharacterEncodingFilter", new CharacterEncodingFilter());
         charEncodingFilter.setInitParameter("encoding", "utf-8");
