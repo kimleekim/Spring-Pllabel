@@ -16,10 +16,18 @@ public class SecondPageImpl implements SecondPage {
     @Autowired
     InstafoodDao instafoodDao;
     @Autowired
+    InstaplaceDao instaplaceDao;
+    @Autowired
     YoutubehotDao youtubehotDao;
     @Autowired
     YoutubefoodDao youtubefoodDao;
     private int checkYoutube = 1;
+    private List<String> love = Arrays.asList("애인", "연인", "남친", "여친", "자친구", "자기", "쟈", "사랑", "럽", "연애", "lov",
+            "luv", "데이");
+    private List<String> friend = Arrays.asList("친구", "칭", "쓰", "단짝", "지기", "동네", "사친", "우정");
+    private List<String> family = Arrays.asList("엄", "빠", "부모", "가족", "할", "식구", "패밀리", "애", "아이", "남편", "신랑",
+            "부인", "아내");
+    private Long count[] = {Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)};
 
     @Override
     public String getLikeCNT(String station) {
@@ -45,7 +53,60 @@ public class SecondPageImpl implements SecondPage {
 
     @Override
     public String withWho(String station) {
-        return "미완";
+        Map<String, Object> param = new HashMap<>();
+        param.put("station", station);
+        List<Instaplace> totalData = instaplaceDao.findByParam(param);
+
+        for (Instaplace data : totalData) {
+            List<String> countedList = data.getHashtagOfJson();
+            countHashtag(countedList, 0);
+            countHashtag(countedList, 1);
+            countHashtag(countedList, 2);
+        }
+
+        Long max = count[0];
+        int index = 0;
+        for (int i = 1; i < 3; i++) {
+            if (max < count[i]) {
+                index = i;
+                max = count[i];
+            }
+        }
+
+        if (love.equals(takeCategory(index))) {
+            return "연인";
+        }
+        else if (family.equals(takeCategory(index))) {
+            return "가족";
+        }
+        else {
+            return "친구";
+        }
+    }
+
+    private List<String> takeCategory (int index) {
+        switch (index) {
+            case 0:
+                return love;
+            case 1:
+                return friend;
+            default:
+                return family;
+        }
+    }
+
+    private void countHashtag (List<String> hashtags, int index) {
+        List<String> filter = null;
+
+        filter = takeCategory(index);
+        for (String hashtag : hashtags) {
+            for (String countKeyword : filter) {
+                if (hashtag.contains(countKeyword)) {
+                    count[index]++;
+                    break;
+                }
+            }
+        }
     }
 
     @Override
