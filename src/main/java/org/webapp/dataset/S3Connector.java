@@ -26,7 +26,6 @@ import java.util.Optional;
 public class S3Connector {
     @Autowired
     private AmazonS3Client amazonS3Client;
-    int fileIndex = (int) Math.random();
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -54,6 +53,7 @@ public class S3Connector {
 
     public MultipartFile convertFileDatatype(int isInsta, String photoURL, String url) throws IOException {
         MultipartFile multipartFile = null;
+        int fileIndex = (int) (Math.random() * 100000 + 1);
 
         if (isInsta == 1) {
             int targetNum = photoURL.indexOf("640w");

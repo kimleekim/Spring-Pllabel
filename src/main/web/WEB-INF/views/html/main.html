@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/test.css">
+    <title>Welcome to Pllabel!</title>
+</head>
+<body>
+<h2>main 페이지!</h2>
+<form action="/" method="POST" id="stationSearch">
+    <div>지하철역 : <input type="text" name="station" value=""></div>
+    <input type="submit" value="검색"/>
+</form>
+<h4>맛집 랭킹 3위</h4>
+<table>
+    <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->
+    <tr th:each="restaurant : ${top3_restaurant}">
+        <td th:text="${restaurant}">restaurant</td>
+    </tr>
+</table>
+<h4>핫플 랭킹 3위</h4>
+<table>
+    <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
+    <tr th:each="place : ${top3_place}">
+        <td th:text="${place}">place</td>
+    </tr>
+</table>
+<h4>실시간 랭킹 3위</h4>
+<table>
+    <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
+    <tr th:each="station : ${top3_station}">
+        <td th:text="${station}">station</td>
+    </tr>
+</table>
+</body>
+</html>

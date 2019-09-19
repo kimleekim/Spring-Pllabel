@@ -1,0 +1,125 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+<head layout:fragment="content">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="/static/js/drawChart.js"></script>
+    <script src="/static/js/postFrame.js"></script>
+    <title>Result</title>
+</head>
+<body>
+<h1>2번째 페이지</h1>
+<!--/*@thymesVar id="likecnt" type="org.webapp.controller.PageController"*/-->
+<input type="button" value="좋아요" style="float:left" onclick="">
+<p th:text="${likecnt}">&nbsp;like</p>
+<!--/*@thymesVar id="withwho" type="org.webapp.controller.PageController"*/-->
+<!--/*@thymesVar id="station" type="org.webapp.controller.PageController"*/-->
+<div style="float: left">많은 사람들이&nbsp;</div>
+<div style="float:left" th:text="${station}">station</div>
+<div style="float: left">을&nbsp;</div>
+<div style="float:left" th:text="${withwho}">withwho</div>
+<div>와(과) 주로 같이 갑니다!</div>
+<input type="button" onclick="location.href='/'" value="초기 화면으로">
+
+<p>핫플레이스</p>
+<div layout:fragment="content" id="container_hotPost" style="border:0.2px solid gray">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var hotplace = /*[[${hotPost}]]*/;
+        /*]]>*/
+        for (i = 0; i < 4; i++) {
+            postFrame(i, hotplace[i], 'container_hotPost');
+        }
+    </script>
+</div>
+<form action="/moreplace" method="POST" id="morePlace">
+    <input type="submit" value="더보기">
+</form>
+<br>
+
+<p>핫푸드</p>
+<div layout:fragment="content" id="container_foodPost" style="border:0.2px solid gray">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var hotfood = /*[[${foodPost}]]*/;
+        /*]]>*/
+        for (i = 0; i < 4; i++) {
+            postFrame(i, hotfood[i], 'container_foodPost');
+        }
+    </script>
+</div>
+<form action="/morefood" method="POST" id="moreFood">
+    <input type="submit" value="더보기">
+</form>
+<br>
+
+<h1>3번째 페이지</h1>
+<p>요일별 방문 빈도</p>
+<div layout:fragment="content" style="width: 75%; height: 75%">
+    <canvas id="byDayPostChart" width="300" height="100"></canvas>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var byDayCount = /*[[${byDayPostCount}]]*/;
+        /*]]>*/
+        drawChart('byDayPostChart',
+        'line',
+        ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+        byDayCount,
+        '#2EFEC8',
+        true);
+    </script>
+</div>
+
+<p>이번주 방문 빈도</p>
+<div layout:fragment="content" style="width: 75%; height: 75%">
+    <canvas id="thisWeekPostChart" width="300" height="100"></canvas>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var thisWeekCount = /*[[${thisWeekPostCount}]]*/;
+        /*]]>*/
+        drawChart('thisWeekPostChart',
+        'line',
+        ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+        thisWeekCount,
+        '#2EFEC8',
+        true);
+    </script>
+</div>
+
+<p>연관 해시태그 TOP5</p>
+<div layout:fragment="content" style="width: 25%; height: 25%">
+    <canvas id="relatedHashtagChart" width="100" height="100"></canvas>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var hashtags = /*[[${top5_hashtag}]]*/;
+        var hashtagCount = /*[[${top5_hashtagCount}]]*/;
+        /*]]>*/
+        drawChart('relatedHashtagChart',
+            'doughnut',
+            hashtags,
+            hashtagCount,
+            [
+                '#2EFEC8',
+                '#81F7D8',
+                '#A9F5E1',
+                '#CEF6EC',
+                '#E0F8F1'
+            ],
+            false);
+    </script>
+</div>
+
+<!--p>핫플 표시</p>
+<div id="staticMap" style="width:500px;height:400px;"></div>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey="></script>
+<script th:inline="javascript">
+    var staticMapContainer  = document.getElementById('staticMap'), // 이미지 지도를 표시할 div
+        staticMapOption = {
+            // center: new kakao.maps.LatLng(33.450701, 126.570667),
+            level: 3
+        };
+
+    // 이미지 지도를 표시할 div와 옵션으로 이미지 지도를 생성합니다
+    var staticMap = new kakao.maps.StaticMap(staticMapContainer, staticMapOption);
+</script-->
+</body>
+</html>
