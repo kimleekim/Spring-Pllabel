@@ -27,7 +27,6 @@ import java.util.Map;
 public class ResetExistedHotPlaceWriter<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResetExistedHotPlaceWriter.class);
-
     private DataSource dataSource;
     private JdbcTemplate jdbc;
 
@@ -57,16 +56,20 @@ public class ResetExistedHotPlaceWriter<T> {
 
     protected void deleteYoutubehotPerStation(List<? extends List<Youtubehot>> objects) {
         logger.info("[FindHotPlaceJob] : ResetYoutubeHotPlace-SuperMethod started.");
-        Map<String, Object> parameter = null;
+
+        String station;
+        String sql;
 
         try {
             System.out.println("지우게 될 역 : " + objects.get(0).get(0).getStation());
-            parameter = Collections.singletonMap("station", objects.get(0).get(0).getStation());
+            station = objects.get(0).get(0).getStation();
         } catch(IndexOutOfBoundsException e) {
             return;
         }
 
-        //youtubehotDao.delete(parameter);
+        sql = "Delete from youtubehot where station=\"" + station + "\"";
+
+        jdbc.update(sql);
     }
 
 }

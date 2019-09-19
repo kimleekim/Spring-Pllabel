@@ -32,7 +32,7 @@ import java.util.*;
 
 @Component
 public class YoutubeApiTrim {
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 5;
+    private static long NUMBER_OF_VIDEOS_RETURNED = 5; //이 숫자만큼 db에 쌓임.
     private static String PROPERTIES_FILENAME = "application.properties";
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -53,6 +53,7 @@ public class YoutubeApiTrim {
         List<String> keywords = new ArrayList<>();
 
         if (isFoodVideo == 1) {
+            NUMBER_OF_VIDEOS_RETURNED = 1;
             parameter.put("station", keyword);
             List<Instafood> instafoods = instafoodDao.findByParam(parameter);
 
@@ -68,18 +69,15 @@ public class YoutubeApiTrim {
             }
             return keywords;
         }
-        else if (isFoodVideo == 2) {
-            keywords.add(keyword);
-            return keywords;
-        }
-        else {
-            return null;
-        }
+
+        return keywords;
     }
 
-    private List<Object> insertVideoData(
-            Iterator<SearchResult> iteratorSearchResults, String station, Properties properties, int isFoodVideo
-    ) throws InterruptedException, IOException, JSONException {
+    private List<Object> insertVideoData (Iterator<SearchResult> iteratorSearchResults,
+                                          String station,
+                                          Properties properties,
+                                          int isFoodVideo) throws InterruptedException, IOException, JSONException {
+
         List<Object> returnVideoList = new ArrayList<>();
 
         if (!iteratorSearchResults.hasNext()) {
@@ -200,7 +198,8 @@ public class YoutubeApiTrim {
         }
     }
 
-    public List<Object> SearchKeyword(String keyword, String station, int isFoodVideo) {
+    public List<Object> SearchKeyword(String keyword, String station, int isFoodVideo) { //2면 hot
+        List<String> queryTerms;
         List<Object> returnVideoList = null;
         Properties properties = new Properties();
 
@@ -217,7 +216,6 @@ public class YoutubeApiTrim {
                 public void initialize(HttpRequest request) throws IOException {}
             }).setApplicationName("youtube-cmdline-search-sample").build();
 
-            List<String> queryTerms = getInputQuery(keyword, isFoodVideo);
 
             YouTube.Search.List search = youtube.search().list("id,snippet");
             String apiKey = properties.getProperty("youtube.apikey");
@@ -225,21 +223,26 @@ public class YoutubeApiTrim {
             search.setType("video");
             search.setFields("items(id/kind,id/videoId,snippet/title,snippet/channelTitle,snippet/publishedAt,snippet/thumbnails/default/url)");
             search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+
             if (isFoodVideo == 2) {
-                search.setQ(queryTerms.get(0));
+                search.setQ(keyword); //setting search keyword.
                 SearchListResponse searchResponse = search.execute();
                 List<SearchResult> searchResultList = searchResponse.getItems();
                 returnVideoList = insertResult(searchResultList, station, properties, isFoodVideo);
             }
             else if (isFoodVideo == 1) {
+                queryTerms = getInputQuery(keyword, isFoodVideo);
                 returnVideoList = new ArrayList<>();
+
                 for (String queryTerm : queryTerms) {
                     search.setQ(queryTerm);
                     SearchListResponse searchResponse = search.execute();
                     List<SearchResult> searchResultList = searchResponse.getItems();
                     returnVideoList.add(insertResult(searchResultList, station, properties, isFoodVideo));
                 }
+
             }
+
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
                     + e.getDetails().getMessage());
