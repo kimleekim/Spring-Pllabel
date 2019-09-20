@@ -8,7 +8,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.webapp.batch.CrawlImageDelegator;
+import org.webapp.batch.CrawlingDelegator;
 import org.webapp.dataset.InstaCrawlImpl;
 import org.webapp.model.Instahot;
 
@@ -20,7 +20,7 @@ import java.util.*;
 
 @StepScope
 @Component
-public class SetupInstaHotPlaceProcessor extends CrawlImageDelegator<Instahot>
+public class SetupInstaHotPlaceProcessor extends CrawlingDelegator<Instahot>
                         implements ItemProcessor<Map.Entry<String, String>, List<Instahot>> {
     private static final Logger logger = LoggerFactory.getLogger(SetupInstaHotPlaceProcessor.class);
 
