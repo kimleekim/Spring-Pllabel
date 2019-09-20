@@ -31,6 +31,8 @@ public interface InstaCrawl {
 
     public String getPhotopageURL(WebDriver driver);
 
-    public List<String> getHashtags(WebDriver driver, String post);
+    public List<String> getHashtags(WebDriver driver) throws InterruptedException;
+
+    public List<String> findHashtags(String content, List<String> hashtags);
 
 }
