@@ -29,6 +29,11 @@ public class PageController {
     private ThirdPageImpl thirdPage;
     private String station = "";
 
+    @GetMapping("/intro")
+    public String setIntro() {
+        return "loading.html";
+    }
+
     @GetMapping("/")
     public String setMain(Model model) {
         List<String> top3_station = mainPage.getTOP3Station();
