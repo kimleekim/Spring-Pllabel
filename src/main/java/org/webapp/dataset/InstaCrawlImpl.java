@@ -80,12 +80,12 @@ public class InstaCrawlImpl implements InstaCrawl {
             locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(2) > div > label > input");
             webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
 
-            driver.findElement(locator).sendKeys("projectt452");
+            driver.findElement(locator).sendKeys("projecttest91");
             System.out.println(driver.findElement(locator).getAttribute("name"));
             locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(3) > div > label > input");
             webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
 
-            driver.findElement(locator).sendKeys("project123");
+            driver.findElement(locator).sendKeys("project");
             System.out.println(driver.findElement(locator).getAttribute("name"));
 
             driver.findElement(locator).sendKeys(Keys.ENTER);
@@ -97,7 +97,9 @@ public class InstaCrawlImpl implements InstaCrawl {
             catch(TimeoutException e) {
 
                 if(driver.getCurrentUrl().contains("login")) {
-                    driver.findElement(By.xpath("//*[@id=\"react-root\"]/section/main/div/article/div/div[1]/div/form/div[4]/button")).click();
+                    driver.findElement(locator).sendKeys(Keys.ENTER);
+                    driver.findElement(locator).submit();
+
                     webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"react-root\"]/section/main/article/header/div[2]/h1")));
                 } else {
                     Thread.sleep(10000);
@@ -216,11 +218,26 @@ public class InstaCrawlImpl implements InstaCrawl {
         getSearch = driver.findElements(By.xpath("//*[@id=\"react-root\"]/section/nav/div[2]/div/div/div[2]/div[2]/div[2]/div/a"));
 
         for(WebElement block : getSearch) {
-            if(block.findElement(By.xpath(".//div/div[1]")).getAttribute("class").equals("nebtz coreSpriteLocation")
-                    && block.findElement(By.xpath(".//div/div[2]/div/span")).getText().equals(keyword)) {
+            if(block.findElement(By.xpath(".//div/div[1]")).getAttribute("class").equals("nebtz coreSpriteLocation")) {
 
-                search = block;
-                break;
+                if(tempUrl.contains("location")) {
+
+                    if (block.findElement(By.xpath(".//div/div[2]/div/span")).getText().equals(keyword + "역")) {
+                        search = block;
+                        break;
+                    } else if(keyword.equals("서울역")
+                                && block.findElement(By.xpath(".//div/div[2]/div/span")).getText().equals(keyword)) {
+
+                        search = block;
+                        break;
+                    }
+
+                } else if(tempUrl.contains("temp")
+                            && block.findElement(By.xpath(".//div/div[2]/div/span")).getText().equals(keyword)){
+
+                    search = block;
+                    break;
+                }
             }
         }
 
@@ -336,7 +353,6 @@ public class InstaCrawlImpl implements InstaCrawl {
 
     private int moveTargetPost(WebDriver driver, int skipPosts) {
         this.driver = driver;
-        System.out.println(this.driver);
 
         try {
 
@@ -544,15 +560,25 @@ public class InstaCrawlImpl implements InstaCrawl {
             this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[2]/div/div/button/span"));
             likeCNT = Integer.parseInt(element.getText().replaceAll("\\,", ""));
         } catch (NoSuchElementException one_more_try) {
+
             try {
                 this.element = driver.findElement(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/section[2]/div/div/button/span"));
                 likeCNT = Integer.parseInt(element.getText().replaceAll("\\,", ""));
             } catch (NoSuchElementException no_like_exist) {
-                likeCNT = 0;
+
+                try {
+                    this.element = driver.findElement(By.xpath("/html/body/div[3]/div[2]/div/article/div[2]/section[2]/div/div/button/span"));
+                    likeCNT = Integer.parseInt(element.getText().replaceAll("\\,", ""));
+                } catch(NoSuchElementException one_more_try2) {
+                    likeCNT = 0;
+                }
+
             }
+
         } catch (NullPointerException e) {
             likeCNT = 0;
         }
+
         return likeCNT;
     }
 
@@ -741,7 +767,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         } catch (TimeoutException e) {
 
             try {
-                System.out.println("setPhotoURLElement timeout occur!!");
+                logger.error("setPhotoURLElement timeout occur!!");
                 this.element = driver.findElement(By.className("FFVAD"));
             } catch (NoSuchElementException ee) {
                 this.element = null;
@@ -778,30 +804,31 @@ public class InstaCrawlImpl implements InstaCrawl {
     }
 
     @Override
-    public List<String> getHashtags(WebDriver driver, String posts) {
-        this.webDriverWait = new WebDriverWait(this.driver, 20);
+    public List<String> getHashtags(WebDriver driver) throws InterruptedException {
+        WebDriverWait webDriverWait = new WebDriverWait(driver, 20);
         hashtags = new ArrayList<>();
 
-        if(!posts.equals(""))
-            findHashtags(posts, hashtags);
-
         this.driver = driver;
-        this.findWebElement = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/h2/a");
+        this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/header/div[2]/div[1]/div[1]/h2/a");
 
         try {
             webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(findWebElement));
         } catch (TimeoutException
                 | NoSuchElementException e) {
 
-            return hashtags;
+            Thread.sleep(5000);
         }
 
-        this.element = driver.findElement(findWebElement);
+        try {
+            this.element = driver.findElement(findWebElement);
+        } catch(java.util.NoSuchElementException e) {
+            return hashtags;
+        }
         username = element.getText();
 
         while(true) {
             try{
-                this.findWebElement = By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/li/div/button");
+                this.findWebElement = By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[2]/div[1]/ul/li/div/button/span");
                 this.element = webDriverWait.until(ExpectedConditions.elementToBeClickable(this.findWebElement));
 
                 this.element.click();
@@ -810,13 +837,13 @@ public class InstaCrawlImpl implements InstaCrawl {
             }
         }
         try {
-            commentList = driver.findElements(By.xpath("/html/body/div[4]/div[2]/div/article/div[2]/div[1]/ul/ul"));
+            commentList = driver.findElements(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[2]/div[1]/ul/ul"));
 
             for (WebElement nthComment : commentList) {
-                this.element = nthComment.findElement(By.xpath(".//div/li/div/div/div[2]/h3/a"));
+                this.element = nthComment.findElement(By.xpath(".//div/li/div/div[1]/div[2]/h3/a"));
 
                 if (this.element.getText().equals(username)) {
-                    commentcheck = nthComment.findElement(By.xpath(".//div/li/div/div/div[2]/span")).getText();
+                    commentcheck = nthComment.findElement(By.xpath(".//div/li/div/div[1]/div[2]/span")).getText();
 
                     findHashtags(commentcheck, hashtags);
                 }
@@ -836,10 +863,10 @@ public class InstaCrawlImpl implements InstaCrawl {
                     replyList = nthComment.findElements(By.xpath(".//li/ul/div"));
 
                     for (WebElement nthReply : replyList) {
-                        this.element = nthReply.findElement(By.xpath(".//li/div/div/div[2]/h3/a"));
+                        this.element = nthReply.findElement(By.xpath(".//li/div/div[1]/div[2]/h3/a"));
 
                         if (this.element.getText().equals(username)) {
-                            replycheck = nthReply.findElement(By.xpath(".//li/div/div/div[2]/span")).getText();
+                            replycheck = nthReply.findElement(By.xpath(".//li/div/div[1]/div[2]/span")).getText();
 
                             findHashtags(replycheck, hashtags);
                         }
@@ -856,7 +883,8 @@ public class InstaCrawlImpl implements InstaCrawl {
         return hashtags;
     }
 
-    private List<String> findHashtags(String content, List<String> hashtags) {
+    @Override
+    public List<String> findHashtags(String content, List<String> hashtags) {
         String temp = content;
 
         for (int character=0; character<temp.length(); character++) {

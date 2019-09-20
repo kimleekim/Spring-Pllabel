@@ -77,7 +77,7 @@ public class WebContextConfiguration implements WebMvcConfigurer {
         ServletContextTemplateResolver servletContextTemplateResolver = new ServletContextTemplateResolver(servletContext);
         servletContextTemplateResolver.setPrefix("/WEB-INF/views/html/");
         servletContextTemplateResolver.setSuffix(".html");
-        servletContextTemplateResolver.setTemplateMode("HTML5");
+        servletContextTemplateResolver.setTemplateMode("HTML");
 
         return servletContextTemplateResolver;
     }

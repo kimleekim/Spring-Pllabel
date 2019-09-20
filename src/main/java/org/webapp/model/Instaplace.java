@@ -99,9 +99,14 @@ public class Instaplace {
 
         } catch(StringIndexOutOfBoundsException
                 | IllegalStateException
-                | JsonSyntaxException e) {
+                | JsonSyntaxException
+                | NullPointerException e) {
 
             tempArray = gson.fromJson(getHashtag(), String[].class);
+
+            if(tempArray == null) {
+                tempArray = new String[0];
+            }
             toJavaObject = new ArrayList<>(Arrays.asList(tempArray));
 
             return toJavaObject;
