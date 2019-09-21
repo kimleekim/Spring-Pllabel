@@ -65,12 +65,7 @@ public class MapSearchContextImpl implements MapSerachContext {
                         if (station.findElement(By.xpath(".//div[3]/strong/a[2]")).getAttribute("title").contains(subway.get("station"))) {
                             if (station.findElement(By.xpath(".//div[5]/div[2]/p[1]")).getText().contains("서울")) {
                                 System.out.println("추가될 지하철역 : " + subway.get("station"));
-                                if((subway.get("station") + "역").equals("서울역역")) {
-                                    overall.setStation(subway.get("station"));
-                                }
-                                else {
-                                    overall.setStation(subway.get("station") + "역");
-                                }
+                                overall.setStation(subway.get("station"));
                                 overallDao.save(overall);
                             }
                             break;
@@ -81,12 +76,6 @@ public class MapSearchContextImpl implements MapSerachContext {
 
             }
             searchArea.clear();
-
-            if (subway.get("station").equals("수원")) {
-                System.out.println("추가될 지하철역 : " + subway.get("station"));
-                overall.setStation(subway.get("station") + "역");
-                overallDao.save(overall);
-            }
         }
     }
 
