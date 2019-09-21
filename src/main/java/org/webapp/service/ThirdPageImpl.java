@@ -15,8 +15,12 @@ public class ThirdPageImpl implements ThirdPage {
     private List<String> blackList = Arrays.asList(
             "ootd", "좋아요", "좋반", "스타", "일상", "daily", "소통", "follow", "감성", "인친",
             "데일리", "반사", "퇴근", "출근", "직장", "불금", "오오티디", "팔", "sel", "insta", "셀", "flf");
-    private Long top5[] = {Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)};
-    private String top5hashtag[] = {"", "", "", "", ""};
+    private Long top10[] =
+            {
+                    Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0),
+                    Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)
+            };
+    private String top10hashtag[] = {"", "", "", "", "", "", "", "", "", ""};
 
     private void getData (String station) {
         Map<String, Object> param = new HashMap<>();
@@ -44,14 +48,14 @@ public class ThirdPageImpl implements ThirdPage {
                 }
             }
         }
-        getTop5hashtag(hashtagRanking);
+        gettop10hashtag(hashtagRanking);
 
-        return top5hashtag;
+        return top10hashtag;
     }
 
     @Override
     public Long[] getRelatedHashtagCounts(String station) {
-        return top5;
+        return top10;
     }
 
 
@@ -78,35 +82,34 @@ public class ThirdPageImpl implements ThirdPage {
         return modifiedHashtags;
     }
 
-    private void getTop5hashtag (Map<String, Long> hashtags) {
+    private void gettop10hashtag (Map<String, Long> hashtags) {
         for (String hashtag : hashtags.keySet()) {
-            for (int i = 0; i < 5; i++) {
-                if (hashtags.get(hashtag) >= top5[i]) {
-                    updateRanking(top5hashtag, top5, i);
-                    top5[i] = hashtags.get(hashtag);
-                    top5hashtag[i] = hashtag;
+            for (int i = 0; i < 10; i++) {
+                if (hashtags.get(hashtag) > top10[i]) {
+                    updateRanking(top10hashtag, top10, i);
+                    top10[i] = hashtags.get(hashtag);
+                    top10hashtag[i] = hashtag;
+                    break;
+                }
+                else if (hashtags.get(hashtag) == top10[i]) {
+                    updateRanking(top10hashtag, top10, i + 1);
+                    top10[i + 1] = hashtags.get(hashtag);
+                    top10hashtag[i + 1] = hashtag;
                     break;
                 }
             }
         }
     }
 
-    private void updateRanking(String[] top5hashtag, Long[] top5, int index) {
-        if (index == 0) {
-            top5[index + 4] = top5[index + 3];
-            top5hashtag[index + 4] = top5hashtag[index + 3];
-        }
-        if (index < 2) {
-            top5[index + 3] = top5[index + 2];
-            top5hashtag[index + 3] = top5hashtag[index + 2];
-        }
-        if (index < 3) {
-            top5[index + 2] = top5[index + 1];
-            top5hashtag[index + 2] = top5hashtag[index + 1];
-        }
-        if (index < 4) {
-            top5[index + 1] = top5[index];
-            top5hashtag[index + 1] = top5hashtag[index];
+    private void updateRanking(String[] top10hashtag, Long[] top10, int index) {
+        for (int i = 9; i > 0; i--) {
+            if (i != index) {
+                top10[i] = top10[i - 1];
+                top10hashtag[i] = top10hashtag[i - 1];
+            }
+            else {
+                break;
+            }
         }
     }
 

@@ -1,0 +1,141 @@
+.postLine{
+    width: 1250px;
+    height: 600px;
+    position: static;
+    margin-top: 30px;
+    float: left;
+}
+
+.insmain{
+    width: 250px;
+    height: 600px;
+    text-align: center;
+    margin-right: 15px;
+}
+
+.youtmain{
+    width: 450px;
+    height: 600px;
+    text-align: center;
+}
+
+.inspic{
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    margin: 5px;
+    /*border: 3px solid #c99;*/
+    background-image: linear-gradient(#594BC2, #6A3AB2, #A23B92, #C93E74, #D84C5A, #E66A3E, #EE8941, #F5C364);
+    -webkit-background-clip: border;
+    /*color: transparent;*/
+    background-position: center center;
+    background-size: cover;
+}
+
+.youtpic{
+    display: inline-block;
+    width: 400px;
+    height: 200px;
+    margin: 5px;
+    background-color: #CC3D32;
+    background-position: center center;
+    background-size: cover;
+}
+
+.ins-body{
+    flex: 1 1 auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    height: 250px;
+    width: 250px;
+    /*padding: 1.25rem;*/
+    /*padding-top: 1.25rem;*/
+    /*padding-right: 1.25rem;*/
+    /*padding-bottom: 1.25rem;*/
+    /*padding-left: 1.25rem;*/
+}
+
+.yout-body{
+    flex: 1 1 auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    height: 250px;
+    width: 450px;
+}
+
+.ins-text{
+    width: 250px;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: left;
+}
+
+.yout-text{
+    width: 450px;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: left;
+}
+
+.text-date{
+    font-size: 80%;
+    font-weight: 400;
+    top: 0;
+    right: 0;
+    text-align: center;
+    /*margin-bottom: 1rem;*/
+}
+
+.yout-title{
+    width: 450px;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: left;
+    font-weight: 600;
+}
+
+morePost{
+    width: 40px;
+    height: 600px;
+    float: left;
+    position: static;
+}
+
+input.morePost{
+    background: url("../img/plus.png") no-repeat;
+    width: 40px;
+    height: 40px;
+}
+
+/*p {*/
+/*    margin-top: 0;*/
+/*    margin-bottom: 1rem;*/
+/*}*/
+
+/**, ::after, ::before {*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/*p {*/
+/*    display: block;*/
+/*    margin-block-start: 1em;*/
+/*    margin-block-end: 1em;*/
+/*    margin-inline-start: 0px;*/
+/*    margin-inline-end: 0px;*/
+/*}*/
+
+
+
+
+

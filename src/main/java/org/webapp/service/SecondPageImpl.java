@@ -6,6 +6,8 @@ import org.webapp.dao.*;
 import org.webapp.model.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service("secondpageservice")
 public class SecondPageImpl implements SecondPage {
@@ -23,10 +25,12 @@ public class SecondPageImpl implements SecondPage {
     YoutubefoodDao youtubefoodDao;
     private int checkYoutube = 1;
     private List<String> love = Arrays.asList("애인", "연인", "남친", "여친", "자친구", "자기", "쟈", "사랑", "럽", "연애", "lov",
-            "luv", "데이");
-    private List<String> friend = Arrays.asList("친구", "칭", "쓰", "단짝", "지기", "동네", "사친", "우정");
-    private List<String> family = Arrays.asList("엄", "빠", "부모", "가족", "할", "식구", "패밀리", "애", "아이", "남편", "신랑",
-            "부인", "아내");
+            "luv", "데이트", "커플", "결혼");
+    private Pattern lovePattern = Pattern.compile("^[0-9]+$");
+    private List<String> friend = Arrays.asList("친구", "칭", "단짝", "지기", "동네", "사친", "우정", "동기", "친스타그램",
+            "의리", "으리", "모임");
+    private List<String> family = Arrays.asList("엄마", "아빠", "부모", "가족", "할", "식구", "패밀리", "애", "아이", "남편", "신랑",
+            "부인", "아내", "육아", "부부", "family", "이네", "신혼", "남매", "형제", "자매");
     private Long count[] = {Long.valueOf(0), Long.valueOf(0), Long.valueOf(0)};
 
     @Override
@@ -64,9 +68,9 @@ public class SecondPageImpl implements SecondPage {
             countHashtag(countedList, 2);
         }
 
-        Long max = count[0];
-        int index = 0;
-        for (int i = 1; i < 3; i++) {
+        Long max = count[1];
+        int index = 1;
+        for (int i = 0; i < 3; i++) {
             if (max < count[i]) {
                 index = i;
                 max = count[i];
@@ -100,6 +104,15 @@ public class SecondPageImpl implements SecondPage {
 
         filter = takeCategory(index);
         for (String hashtag : hashtags) {
+            if (index == 0) {
+                Matcher matcher = lovePattern.matcher(hashtag);
+                if (matcher.find()) {
+                    if (hashtag.contains("주년") || hashtag.contains("일")) {
+                        count[index]++;
+                        continue;
+                    }
+                }
+            }
             for (String countKeyword : filter) {
                 if (hashtag.contains(countKeyword)) {
                     count[index]++;
@@ -112,11 +125,11 @@ public class SecondPageImpl implements SecondPage {
     @Override
     public Object[] showHotPost(String station, boolean isMorepage) {
         int POST_COUNT_TO_SHOW = 4;
-        
+
 //        if (isMorepage) {
 //            POST_COUNT_TO_SHOW = 40;
 //        }
-        
+
         Object[] returnPosts = new Object[POST_COUNT_TO_SHOW];
         Map<String, Object> param = new HashMap<>();
 

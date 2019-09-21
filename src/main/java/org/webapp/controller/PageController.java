@@ -49,14 +49,14 @@ public class PageController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST, produces="text/plain;charset=UTF-8")
     public String setResultPage(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                              Model model) throws IOException {
+                                Model model) throws IOException {
         station = httpServletRequest.getParameter("station");
 
         station = mainPage.setStationframe(station);
         if (!mainPage.isExistStation(station)) {
             httpServletResponse.setContentType("text/html; charset=UTF-8");
             PrintWriter out = httpServletResponse.getWriter();
-            out.println("<script>alert('아직 지원하지 않는 지하철역 입니다! 서울시 내 지하철역으로 재검색해주세요.');" +
+            out.println("<script>alert('아직 지원하지 않는 지역 입니다! 서울시 내 범위로 재검색해주세요.');" +
                     "history.go(-1);</script>");
             out.flush();
 
@@ -70,8 +70,8 @@ public class PageController {
             model.addAttribute("hotPost", secondPage.showHotPost(station, false));
             model.addAttribute("foodPost", secondPage.showFoodPost(station, false));
 
-            model.addAttribute("top5_hashtag", thirdPage.getRelatedHashtags(station));
-            model.addAttribute("top5_hashtagCount", thirdPage.getRelatedHashtagCounts(station));
+            model.addAttribute("top10_hashtag", thirdPage.getRelatedHashtags(station));
+            model.addAttribute("top10_hashtagCount", thirdPage.getRelatedHashtagCounts(station));
             model.addAttribute("byDayPostCount", thirdPage.getByDayPostGraph(station));
             model.addAttribute("thisWeekPostCount", thirdPage.getThisWeekPostGraph(station));
 
