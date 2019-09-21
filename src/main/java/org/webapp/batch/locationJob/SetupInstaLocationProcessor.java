@@ -64,7 +64,7 @@ public class SetupInstaLocationProcessor extends CrawlingDelegator<Instaplace>
     }
 
     @Override
-    public List<Instaplace> process(Overall overall) throws ParseException, InterruptedException {
+    public List<Instaplace> process(Overall overall) throws Exception {
         logger.info("[SearchLocationJob] : SetupInstaLocation-ItemProcessor started.");
 
         List<Instaplace> objectList = new ArrayList<>();
@@ -80,11 +80,13 @@ public class SetupInstaLocationProcessor extends CrawlingDelegator<Instaplace>
         Map<String, Date> latestCrawlDate = this.dataShareBean.getLatestDatePerStation();
         Date today = Date.valueOf(ZonedDateTime.now().withZoneSameInstant(zid).toLocalDate());
 
+        this.dataShareBean.putRestaurantsPerStation(station, overall.getRestaurantsOfJson());
+
         if(latestCrawlDate.size() == 0 || latestCrawlDate.get(station) == null) {
             limitDate = Date.valueOf(ZonedDateTime
                                     .now()
                                     .withZoneSameInstant(zid)
-                                    .minusDays(4)
+                                    .minusMonths(3)
                                     .toLocalDate());
         }
         else {
@@ -149,7 +151,8 @@ public class SetupInstaLocationProcessor extends CrawlingDelegator<Instaplace>
             pagelinks.put(object, instaCrawlImpl.getPhotopageURL(this.webDriver));
         }
 
-        objectList = super.setPostContent(this.instaCrawlImpl, this.webDriver, pagelinks);
+        super.setDataShareBean(this.dataShareBean);
+        objectList = super.setLocationPostContent(this.instaCrawlImpl, this.webDriver, pagelinks);
 
         return objectList;
     }

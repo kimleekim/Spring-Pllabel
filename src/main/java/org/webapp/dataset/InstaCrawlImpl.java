@@ -80,12 +80,12 @@ public class InstaCrawlImpl implements InstaCrawl {
             locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(2) > div > label > input");
             webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
 
-            driver.findElement(locator).sendKeys("projecttest91");
+            driver.findElement(locator).sendKeys("jessicaaa464");
             System.out.println(driver.findElement(locator).getAttribute("name"));
             locator = By.cssSelector("#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(3) > div > label > input");
             webDriverWait.until(ExpectedConditions.elementToBeClickable(locator));
 
-            driver.findElement(locator).sendKeys("project");
+            driver.findElement(locator).sendKeys("1212123");
             System.out.println(driver.findElement(locator).getAttribute("name"));
 
             driver.findElement(locator).sendKeys(Keys.ENTER);
@@ -114,8 +114,12 @@ public class InstaCrawlImpl implements InstaCrawl {
     @Override
     public WebDriver setUpWebDriver (String search, String station) throws Exception {
 
-        if (search.contains(station)) { isFoodpost = 1; }
-        else { isFoodpost = 2; }
+        if (search.contains(station)) {
+            isFoodpost = 1;
+        }
+        else {
+            isFoodpost = 2;
+        }
 
         this.driver = driverContext.setupChromeDriver();
         this.webDriverWait = new WebDriverWait(this.driver, 40);
@@ -746,7 +750,8 @@ public class InstaCrawlImpl implements InstaCrawl {
 
         if (!(photoURL.equals(""))) {
             MultipartFile multipartFile = s3Connector.convertFileDatatype(1, photoURL, url.substring(14, 19));
-            return s3Connector.upload(multipartFile, "static");
+            //return s3Connector.upload(multipartFile, "static");
+            return "s3에 올라감";
         }
         else {
             return photoURL;

@@ -9,7 +9,9 @@ import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.jsr.configuration.xml.JobFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.webapp.batch.BatchSettings;
+import org.webapp.model.Instafood;
 import org.webapp.model.Instaplace;
 import org.webapp.model.Overall;
 
@@ -62,7 +65,8 @@ public class SearchLocationJob {
     public CronTriggerFactoryBean searchLocationTrigger() {
         return BatchSettings.cronTriggerFactoryBeanBuilder()
                 .name("SearchLocation-Trigger")
-                .cronExpression("0 0/2 * * * ?") // 1~2분마다
+                .cronExpression("0 30 3 * * ? *")
+                //.cronExpression("0 0/2 * * * ?") // 1~2분마다
                 .jobDetailFactoryBean(searchLocationJobSchedule())
                 .build();
     }
@@ -79,6 +83,7 @@ public class SearchLocationJob {
         return jobBuilderFactory.get(JOB_NAME)
                 .start(getLatestCrawlDateStep())
                 .next(setupInstaLocationStep())
+                .next(setupRestaurantsInLocationStep())
                 .build();
     }
 
@@ -108,7 +113,7 @@ public class SearchLocationJob {
         logger.info("[SearchLocationJob] : SetupInstaPlace-ItemReader started.");
 
         return new JdbcCursorItemReaderBuilder<Overall>()
-                .sql("SELECT station FROM overall")
+                .sql("SELECT station, restaurants FROM overall")
                 .rowMapper(new BeanPropertyRowMapper<>(Overall.class))
                 .fetchSize(CHUNK_SIZE)
                 .dataSource(this.dataSource)
@@ -124,6 +129,40 @@ public class SearchLocationJob {
     @Bean
     public ItemWriter<List<Instaplace>> setupInstaLocationWriter() {
         return new SetupInstaLocationWriter();
+    }
+
+    @Bean
+    @JobScope
+    public Step setupRestaurantsInLocationStep() {
+        return stepBuilderFactory.get(FOOD_STEP_NAME)
+                .<Instafood, Instafood>chunk(30)
+                .reader(setupRestaurantsInLocationReader())
+                .processor(setupRestaurantsInLocationProcessor())
+                .writer(setupRestaurantsInLocationWriter())
+                .transactionManager(this.transactionManager)
+                .build();
+    }
+
+    @Bean(destroyMethod = "")
+    public SetupRestaurantsInLocationReader setupRestaurantsInLocationReader() {
+        return new SetupRestaurantsInLocationReader();
+    }
+
+    @Bean
+    public ItemProcessor<Instafood, Instafood> setupRestaurantsInLocationProcessor() {
+        return new SetupRestaurantsInLocationProcessor();
+    }
+
+    @Bean
+    public JdbcBatchItemWriter<Instafood> setupRestaurantsInLocationWriter() {
+        String sql = "INSERT INTO instafood(station, post, date, likeCNT, myRestaurant, photoURL) " +
+                        "VALUES(:station, :post, :date, :likeCNT, :myRestaurant, :photoURL)";
+
+        return new JdbcBatchItemWriterBuilder<Instafood>()
+                .dataSource(this.dataSource)
+                .sql(sql)
+                .beanMapped()
+                .build();
     }
 
 }
