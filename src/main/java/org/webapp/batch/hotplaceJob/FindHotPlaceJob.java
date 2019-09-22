@@ -11,6 +11,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,10 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.webapp.batch.BatchSettings;
-import org.webapp.model.Instahot;
-import org.webapp.model.Instaranking;
-import org.webapp.model.Overall;
-import org.webapp.model.Youtubehot;
+import org.webapp.model.*;
 
 import javax.sql.DataSource;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -43,7 +42,9 @@ public class FindHotPlaceJob {
     private static final String FIRST_STEP_NAME = "setupPlaceRanking-Step";
     private static final String SECOND_STEP_NAME = "setupInstaHotPlace-Step";
     private static final String THIRD_STEP_NAME = "setupYoutubeHotPlace-Step";
+    private static final String FOOD_STEP_NAME = "setupRestaurantsInTag-Step";
     private static final int CHUNK_SIZE = 1;
+    private static final int FOOD_CHUNK_SIZE = 20;
     private static final Logger logger = LoggerFactory.getLogger(FindHotPlaceJob.class);
 
     private JobBuilderFactory jobBuilderFactory;
@@ -51,6 +52,7 @@ public class FindHotPlaceJob {
     private DataSource dataSource;
     private DataSourceTransactionManager transactionManager;
     private JdbcTemplate jdbcTemplate;
+    private HotPlaceStepsDataShareBean dataShareBean;
 
     FindHotPlaceJob() {}
 
@@ -58,13 +60,15 @@ public class FindHotPlaceJob {
     public FindHotPlaceJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            DataSource dataSource,
-                           DataSourceTransactionManager transactionManager) {
+                           DataSourceTransactionManager transactionManager,
+                           HotPlaceStepsDataShareBean dataShareBean) {
 
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.dataSource = dataSource;
         this.transactionManager = transactionManager;
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
+        this.dataShareBean = dataShareBean;
     }
 
 //    @Bean
@@ -79,7 +83,7 @@ public class FindHotPlaceJob {
         return BatchSettings.cronTriggerFactoryBeanBuilder()
                 .name("FindHotPlace-Trigger")
                 .cronExpression("0 0/2 * * * ?") // 1~2분마다
-                //.cronExpression("0 30 6 * * ? *") //매일 오전 6시 30분에
+                //.cronExpression("0 30 1 * * ? *") //매일 오전 1시 30분에
                 .jobDetailFactoryBean(findHotPlaceJobSchedule())
                 .build();
     }
@@ -96,6 +100,7 @@ public class FindHotPlaceJob {
         return jobBuilderFactory.get(JOB_NAME)
                 .start(resetInstarankingStep())
                 .next(setupPlaceRankingStep())
+                .next(setupRestaurantsInTagStep())
                 .next(setupInstaHotPlaceStep())
                 .next(setupYoutubeHotPlaceStep())
                 .build();
@@ -112,6 +117,9 @@ public class FindHotPlaceJob {
                         logger.info("[FindHotPlaceJob] : ResetInstaranking-Tasklet started.");
                         String sql = "DELETE FROM instaranking";
                         jdbcTemplate.update(sql);
+
+                        String getLatest = "select max(instahot.date) from instahot";
+                        dataShareBean.setLatestDate(jdbcTemplate.queryForObject(getLatest, Date.class));
 
                         return RepeatStatus.FINISHED;
                     }
@@ -131,11 +139,12 @@ public class FindHotPlaceJob {
     }
 
     @Bean(destroyMethod = "")
+    @StepScope
     public JdbcCursorItemReader<Overall> setupPlaceRankingReader() {
         logger.info("[FindHotPlaceJob] : SetupPlaceRanking-ItemReader started.");
 
         return new JdbcCursorItemReaderBuilder<Overall>()
-                .sql("SELECT STATION FROM OVERALL")
+                .sql("SELECT station, restaurants FROM overall")
                 .rowMapper(new BeanPropertyRowMapper<>(Overall.class))
                 .fetchSize(CHUNK_SIZE)
                 .dataSource(this.dataSource)
@@ -152,6 +161,42 @@ public class FindHotPlaceJob {
     @Bean
     public ItemWriter<List<Instaranking>> setupPlaceRankingWriter() {
         return new SetupPlaceRankingWriter();
+    }
+
+    @Bean
+    @JobScope
+    public Step setupRestaurantsInTagStep() {
+        return stepBuilderFactory.get(FOOD_STEP_NAME)
+                .<Map.Entry<Instafood, String>, Instafood>chunk(FOOD_CHUNK_SIZE)
+                .reader(setupRestaurantsInTagReader())
+                .processor(setupRestaurantsInTagProcessor())
+                .writer(setupRestaurantsInTagWriter())
+                .transactionManager(this.transactionManager)
+                .build();
+    }
+
+    @Bean(destroyMethod = "")
+    public SetupRestaurantsInTagReader setupRestaurantsInTagReader() {
+        return new SetupRestaurantsInTagReader();
+    }
+
+    @Bean
+    public ItemProcessor<Map.Entry<Instafood, String>, Instafood> setupRestaurantsInTagProcessor() {
+        return new SetupRestaurantsInTagProcessor();
+    }
+
+    @Bean
+    public ItemWriter<Instafood> setupRestaurantsInTagWriter() {
+        logger.info("[FindHotPlaceJob] : SetupRestaurantsInTag-ItemWriter started.");
+
+        String sql = "INSERT INTO instafood(station, post, date, likeCNT, myRestaurant, photoURL) " +
+                "VALUES(:station, :post, :date, :likeCNT, :myRestaurant, :photoURL)";
+
+        return new JdbcBatchItemWriterBuilder<Instafood>()
+                .dataSource(this.dataSource)
+                .sql(sql)
+                .beanMapped()
+                .build();
     }
 
     @Bean

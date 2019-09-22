@@ -1,45 +1,37 @@
 package org.webapp.batch.hotplaceJob;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.webapp.dataset.InstaCrawl;
+import org.webapp.model.Instafood;
 
-import java.util.*;
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class HotPlaceStepsDataShareBean {
     private static final Logger logger = LoggerFactory.getLogger(HotPlaceStepsDataShareBean.class);
 
-    private List<String> stations = null;
-    private Map<Integer, List<String>> photoPagelinks;
+    private Map<Instafood, String> photoPagelinks;
     private Map<String, String> hotplacePerStation = null;
+    private Date latestDate = null;
+    private Map<String, List<String>> restaurantsPerStation = null;
 
     public HotPlaceStepsDataShareBean() {
-        this.stations = new ArrayList<>();
-        this.photoPagelinks = null;
+        this.photoPagelinks = new HashMap<>();
         this.hotplacePerStation = new HashMap<>();
+        this.restaurantsPerStation = new HashMap<>();
     }
 
-    public void addStation(String station) {
-        if(stations == null) {
-            logger.error("stations-List is not initialized.");
-            return;
-        }
-        else {
-            this.stations.add(station);
-            Collections.sort(this.stations);
-        }
-    }
-
-    public void putFoodPhotoPagelinks(int isFoodPost, List<String> links) {
+    public void putFoodPhotoPagelinks(Instafood instafood, String link) {
         if(photoPagelinks == null) {
-            photoPagelinks = Collections.singletonMap(isFoodPost, links);
-
-        } else {
-            logger.info("photoPagelinks-Map is already full. Set new SingletonMap.");
-            photoPagelinks = Collections.singletonMap(isFoodPost, links);
+            logger.error("photoPagelinks-Map is not initialized.");
         }
+
+        photoPagelinks.put(instafood, link);
     }
 
 
@@ -52,20 +44,21 @@ public class HotPlaceStepsDataShareBean {
         hotplacePerStation.put(station, hotplace);
     }
 
-    public boolean isStationsContain(String keyword) {
-        return stations.contains(keyword);
+    public void setLatestDate(Date latestDate) {
+        this.latestDate = Date.valueOf
+                                (String.valueOf(LocalDate.fromDateFields(latestDate).minusDays(1)));
     }
 
-    public List<String> getStations() {
-        if(stations == null) {
-            logger.error("stations-List is not initialized.");
-            return null;
+    public void putRestaurantsPerStation(String station, List<String> restaurants) {
+        if(restaurantsPerStation == null) {
+            logger.error("restaurantsPerStation-Map is not initialized.");
+            return;
         }
 
-        return stations;
+        restaurantsPerStation.putIfAbsent(station, restaurants);
     }
 
-    public Map<Integer, List<String>> getPhotoPagelinks() {
+    public Map<Instafood, String> getPhotoPagelinks() {
         if(photoPagelinks == null) {
             logger.error("photoPagelinks-Map is not initialized.");
             return null;
@@ -83,12 +76,22 @@ public class HotPlaceStepsDataShareBean {
         return hotplacePerStation;
     }
 
-    public int getSizeOfStations() {
-        if(stations == null) {
-            logger.error("stations-List is not initialized.");
-            return 0;
+    public Date getLatestDate() {
+        if(latestDate == null) {
+            logger.error("latestDate is not initialized.");
+            return null;
         }
 
-        return stations.size();
+        return latestDate;
     }
+
+    public List<String> getRestaurantsPerStation(String station) {
+        if(restaurantsPerStation == null) {
+            logger.error("restaurantsPerStation-Map is not initialized.");
+            return null;
+        }
+
+        return restaurantsPerStation.get(station);
+    }
+
 }

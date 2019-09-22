@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.webapp.dataset.InstaCrawl;
 import org.webapp.dataset.InstaCrawlImpl;
+import org.webapp.model.Instafood;
 import org.webapp.model.Instaranking;
 import org.webapp.model.Overall;
 
@@ -48,7 +49,6 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Overall, List<I
         } catch (Exception e) {
             logger.error("Check your chrome-WebDriver location in local.");
         }
-        System.out.println(this.webDriver + "받아옴");
     }
 
     @Override
@@ -65,12 +65,19 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Overall, List<I
         ZonedDateTime threeMonthsAgo = ZonedDateTime
                                         .now()
                                         .withZoneSameInstant(zid)
-                                        .minusWeeks(1);
+                                        .minusMonths(3);
         int index = 1;
-        List<String> photolinks = new ArrayList<String>();
         Map<String, Integer> countingTags = new HashMap<>();
         Map<String, Long> countingLikes = new HashMap<>();
+        Instafood instafood;
         station = overall.getStation();
+        Date latestFood = dataShareBean.getLatestDate();
+        Date today = Date.valueOf(ZonedDateTime.now().withZoneSameInstant(zid).toLocalDate());
+        this.dataShareBean.putRestaurantsPerStation(station, overall.getRestaurantsOfJson());
+
+        if(latestFood == null) {
+            latestFood = Date.valueOf(threeMonthsAgo.toLocalDate());
+        }
 
         getReadyForCrawling(station);
 
@@ -87,9 +94,7 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Overall, List<I
             }
 
             limitDate = instaCrawlImpl.getDate(this.webDriver);
-            System.out.println(limitDate);
 
-            System.out.println("======================새 글===========================");
             if(limitDate != null
                     && limitDate.equals(Date.valueOf(threeMonthsAgo.toLocalDate()))) {
 
@@ -120,28 +125,33 @@ public class SetupPlaceRankingProcessor implements ItemProcessor<Overall, List<I
             chance = 0;
 
             placetag = instaCrawlImpl.getPlacetag(this.webDriver);
+            likeCnt = instaCrawlImpl.getLikeCNT(this.webDriver);
+
             if(! placetag.equals("")) {
-                System.out.println(placetag);
 
                 countingTags.computeIfPresent(placetag,
                         (String key, Integer value) -> ++value);
                 countingTags.putIfAbsent(placetag, 1);
 
-                likeCnt = instaCrawlImpl.getLikeCNT(this.webDriver);
                 long finalLikeCnt = likeCnt;
-                System.out.println("좋아요수 : " + finalLikeCnt);
 
                 countingLikes.computeIfPresent(placetag,
                         (String key, Long value) -> value += finalLikeCnt);
                 countingLikes.putIfAbsent(placetag, finalLikeCnt);
             }
 
-            photolinks.add(instaCrawlImpl.getPhotopageURL(this.webDriver));
+            if(limitDate!=null && limitDate.after(latestFood) && !limitDate.equals(today)) {
+                instafood = new Instafood();
+                instafood.setStation(station);
+                instafood.setDate(limitDate);
+                instafood.setLikeCNT(likeCnt);
+
+                dataShareBean.putFoodPhotoPagelinks(instafood, instaCrawlImpl.getPhotopageURL(this.webDriver));
+            }
+
         }
 
         objectList = setObjectList(station, countingTags, countingLikes, objectList);
-
-        dataShareBean.putFoodPhotoPagelinks(instaCrawlImpl.getIsFoodpost(), photolinks);
 
         return objectList;
     }

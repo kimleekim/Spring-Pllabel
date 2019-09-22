@@ -6,16 +6,18 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.webapp.batch.FindMyRestaurantsInList;
 import org.webapp.model.Instafood;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 
 @StepScope
 @Component
-public class SetupRestaurantsInLocationProcessor implements ItemProcessor<Instafood, Instafood> {
+public class SetupRestaurantsInLocationProcessor extends FindMyRestaurantsInList
+                                                implements ItemProcessor<Instafood, Instafood> {
+
     private static Logger logger = LoggerFactory.getLogger(SetupRestaurantsInLocationProcessor.class);
 
     private LocationStepsDataShareBean dataShareBean;
@@ -34,36 +36,10 @@ public class SetupRestaurantsInLocationProcessor implements ItemProcessor<Instaf
         List<String> restaurants;
         List<String> myRestaurants = new ArrayList<>();
         String post = instafood.getPost();
-        StringTokenizer stringTokenizer;
         restaurants = this.dataShareBean.getRestaurantsPerStation(station);
 
-        for(String restaurant : restaurants) {
-            boolean checkContains = true;
-            boolean checkFirstWord = false;
-            String trimmedRestaurant = restaurant
-                        .replace("(주)", "")
-                        .replace("u0026", " ");
-            stringTokenizer = new StringTokenizer(trimmedRestaurant);
+        myRestaurants = super.computingMyRestaurants(restaurants, myRestaurants, post);
 
-            while(stringTokenizer.hasMoreTokens()) {
-                String token = stringTokenizer.nextToken();
-                if(checkFirstWord && token.endsWith("점")) {
-                    break;
-                }
-
-                checkFirstWord = true;
-
-                if(! post.contains(token)) {
-                    checkContains = false;
-                    break;
-                }
-            }
-
-            if(checkContains) {
-                myRestaurants.add(restaurant.replace("u0026", "&"));
-            }
-
-        }
         instafood.setMyRestaurant(myRestaurants);
 
         return instafood;

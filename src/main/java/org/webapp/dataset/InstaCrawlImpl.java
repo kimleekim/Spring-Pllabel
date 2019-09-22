@@ -420,7 +420,7 @@ public class InstaCrawlImpl implements InstaCrawl {
         this.driver = driver;
         String realdate = "";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM dd, yyyy");
-        By by = By.cssSelector("body > div._2dDPU.vCf6V > div.zZYga > div > article > div.eo2As > div.k_Q0X.NnvRN > a > time");;
+        By by = By.cssSelector("body > div._2dDPU.vCf6V > div.zZYga > div > article > div.eo2As > div.k_Q0X.NnvRN > a > time");
 
         try {
 
@@ -525,7 +525,7 @@ public class InstaCrawlImpl implements InstaCrawl {
 
         try {
 
-            locator = By.xpath("//*[@id=\"react-root\"]/section/main/div/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span");
+            locator = By.xpath("/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/div/li/div/div/div[2]/span");
             webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 
             this.element = driver.findElement(locator);
@@ -647,6 +647,10 @@ public class InstaCrawlImpl implements InstaCrawl {
     public String getPhotopageURL(WebDriver driver) {   //게시글 화면의 url 리턴
         this.driver = driver;
         return driver.getCurrentUrl();
+    }
+
+    public void setWebDriverWait(WebDriverWait webDriverWait) {
+        this.webDriverWait = webDriverWait;
     }
 
     @Override

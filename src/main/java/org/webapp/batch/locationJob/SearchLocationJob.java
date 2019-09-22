@@ -65,8 +65,8 @@ public class SearchLocationJob {
     public CronTriggerFactoryBean searchLocationTrigger() {
         return BatchSettings.cronTriggerFactoryBeanBuilder()
                 .name("SearchLocation-Trigger")
-                .cronExpression("0 30 3 * * ? *")
-                //.cronExpression("0 0/2 * * * ?") // 1~2분마다
+                .cronExpression("0 30 4 * * ? *")
+                //.cronExpression("0 0/2 * * * ?") // for test
                 .jobDetailFactoryBean(searchLocationJobSchedule())
                 .build();
     }
@@ -155,6 +155,8 @@ public class SearchLocationJob {
 
     @Bean
     public JdbcBatchItemWriter<Instafood> setupRestaurantsInLocationWriter() {
+        logger.info("[SearchLocationJob] : SetupRestaurantsInLocation-ItemReader started.");
+
         String sql = "INSERT INTO instafood(station, post, date, likeCNT, myRestaurant, photoURL) " +
                         "VALUES(:station, :post, :date, :likeCNT, :myRestaurant, :photoURL)";
 
