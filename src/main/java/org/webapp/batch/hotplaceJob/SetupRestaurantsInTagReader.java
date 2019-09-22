@@ -15,7 +15,7 @@ import java.util.Map;
 @StepScope
 @Component
 public class SetupRestaurantsInTagReader implements ItemReader<Map.Entry<Instafood, String>> {
-    private static final Logger logger = LoggerFactory.getLogger(SetupRestaurantsInLocationReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(SetupRestaurantsInTagReader.class);
 
     private HotPlaceStepsDataShareBean dataShareBean;
     private IteratorItemReader<Map.Entry<Instafood, String>> delegate;
