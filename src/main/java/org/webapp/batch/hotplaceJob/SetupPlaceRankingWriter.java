@@ -66,20 +66,16 @@ public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
         boolean marked = false;
 
         for(Instaranking object : objectList) {
-            System.out.println(object.getPlacetag());
-            System.out.println(object.getPlacetagCNT());
-            System.out.println(object.getLikeCNT());
 
             if(max == 0
                     || object.getPlacetagCNT() > max) {
 
                 if(! object.getPlacetag().equals(object.getStation())
-                    || ! object.getPlacetag().equals(object.getStation() + "역")) {
+                    && ! object.getPlacetag().equals(object.getStation() + "역")) {
 
                     marked = false;
                     max = object.getPlacetagCNT();
                     hotplace = object.getPlacetag();
-                    System.out.println("핫플 : " + hotplace);
                 }
             }
             else if(object.getPlacetagCNT() == max) {
@@ -91,13 +87,11 @@ public class SetupPlaceRankingWriter implements ItemWriter<List<Instaranking>> {
             hotplace = computeForHotplace(objectList, max);
         }
 
-        System.out.println(hotplace);
-
         try {
             dataShareBean.putHotplacePerStation(objectList.get(0).getStation(), hotplace);
 
         } catch(IndexOutOfBoundsException e) { }
-        System.out.println("역 별 핫플 목록 : " + dataShareBean.getHotplacePerStation());
+
     }
 
     private String computeForHotplace(List<Instaranking> objectList, long maxTags) {

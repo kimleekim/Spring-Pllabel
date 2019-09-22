@@ -111,7 +111,6 @@ public class SetupInstaLocationProcessor extends CrawlingDelegator<Instaplace>
             }
 
             uploadDate = instaCrawlImpl.getDate(this.webDriver);
-            System.out.println(uploadDate);
 
             if(uploadDate != null && uploadDate.equals(limitDate)) {
 
