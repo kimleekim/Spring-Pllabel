@@ -1,0 +1,90 @@
+.doughnut-hashtag{
+    width: 900px;
+    height: 600px;
+    float: left;
+    display: inline;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.table-hashtag{
+    width: 200px;
+    height: 600px;
+    float: left;
+    display: inline;
+}
+
+.graph-hashtag{
+    width: 700px;
+    height: 600px;
+    float: left;
+    position: static;
+    overflow: hidden;
+    margin-left: 10px;
+}
+
+.graph-title{
+    text-align: center;
+    font-size: x-large;
+    margin-bottom: 5px;
+    margin-top: 100px;
+}
+
+.graph-line{
+    width: 1350px;
+    height: 600px;
+    position: static;
+    display: inline;
+}
+
+canvas.doughnut{
+    width: 100%;
+    height: 100%;
+}
+canvas.chart{
+    width: 70%;
+    height: 100%;
+}
+
+#ranking1{
+    background: #525CCC;
+}
+
+#ranking2{
+    background: #594BC2;
+}
+
+#ranking3{
+    background: #6A3AB2;
+}
+
+#ranking4{
+    background: #A23B92;
+}
+
+#ranking5{
+    background: #C93E74;
+}
+
+#ranking6{
+    background: #D84C5A;
+}
+
+#ranking7{
+    background: #E66A3E;
+}
+
+#ranking8{
+    background: #EE8941;
+}
+
+#ranking9{
+    background: #F4BE90;
+}
+
+#ranking10{
+    background: #FADF8B;
+}
+
+
+

@@ -8,4 +8,6 @@ public interface ThirdPage {
     public Long[] getByDayPostGraph(String station);
 
     public Long[] getThisWeekPostGraph(String station);
+
+    public Object[] getBestDayPost(String station, Long[] ranking);
 }

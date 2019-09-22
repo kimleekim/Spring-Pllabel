@@ -178,4 +178,53 @@ public class ThirdPageImpl implements ThirdPage {
 
         return byDayPostCount;
     }
+
+    @Override
+    public Object[] getBestDayPost(String station, Long[] ranking) {
+        int BestCountedDay = getBestDay(ranking);
+        List<Instaplace> postsInBestDay = new ArrayList<>();
+
+        getData(station);
+        for (Instaplace data : totalData) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(data.getDate());
+            int dayInData = calendar.get(Calendar.DAY_OF_WEEK);
+
+            if (dayInData != 0 && dayInData - 1 == BestCountedDay) {
+                postsInBestDay.add(data);
+            }
+            else if (dayInData == 0 && BestCountedDay == 6) {
+                postsInBestDay.add(data);
+            }
+        }
+
+        return new Object[] {BestCountedDay, getBestPost(postsInBestDay)};
+    }
+
+    private int getBestDay(Long[] ranking) {
+        Long max = ranking[0];
+        int index = 0;
+
+        for (int i = 0; i < 7; i++) {
+            if (max < ranking[i]) {
+                max = ranking[i];
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    private Instaplace getBestPost(List<Instaplace> posts) {
+        long max = 0;
+        Instaplace bestPost = null;
+
+        for (Instaplace post : posts) {
+            if (max < post.getLikeCNT()) {
+                bestPost = post;
+            }
+        }
+
+        return bestPost;
+    }
 }
