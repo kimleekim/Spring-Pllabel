@@ -5,9 +5,9 @@ function postFrame(index, post, id) {
         newDiv.setAttribute('style', 'float: left;');
         newDiv.innerHTML =
             "<div class = \"inspic\">" +
-            "<img src=\"" +
-            post[0] +
-            "alt=\"postImage\">\n" +
+            "<img class = \"inspic-section\"" +
+            "src=\"" + post[0] +
+            "\" alt=\"postImage\">\n" +
             "</div>\n" +
             "<div class = \"ins-body\">\n" +
             "<div class = \"ins-text\">\n" +
@@ -26,9 +26,9 @@ function postFrame(index, post, id) {
         newDiv.setAttribute('style', 'float: left;');
         newDiv.innerHTML =
             "<div class = \"youtpic\">" +
-            "<img src=\"" +
-            post[0] +
-            "alt=\"postImage\">\n" +
+            "<img class = \"youtpic-section\"" +
+            "src=\"" + post[0] +
+            " \" alt=\"postImage\">\n" +
             "</div>\n" +
             "<div class = \"yout-body\">\n" +
             "<div class = \"yout-title\">" +
@@ -41,7 +41,7 @@ function postFrame(index, post, id) {
             "<br>" +
             "<div class = \"text-date\">" +
             post[5] +
-            "&nbsp;조회" +
+            "&nbsp;views" +
             "</div>" +
             "<div class = \"yout-text\">\n" +
             post[2] +

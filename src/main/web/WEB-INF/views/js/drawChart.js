@@ -1,13 +1,14 @@
 function drawChart(chartID, chartType, chartLabel, chartValue, chartColor, additionalOptions) {
     var ctx = document.getElementById(chartID);
+
     var myChart = new Chart(ctx, {
         type: chartType,
         data: {
             labels: chartLabel,
             datasets: [{
                 data: chartValue,
-                backgroundColor: chartColor,
-                borderColor: chartColor,
+                backgroundColor: chartColor[1],
+                borderColor: chartColor[0],
                 borderWidth: 2,
                 fill: true
             }]

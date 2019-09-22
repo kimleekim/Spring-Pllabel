@@ -1,21 +1,21 @@
 .postLine{
     width: 1250px;
-    height: 600px;
+    height: 500px;
     position: static;
-    margin-top: 30px;
+    margin-left: 10px;
     float: left;
 }
 
 .insmain{
     width: 250px;
-    height: 600px;
+    height: 500px;
     text-align: center;
     margin-right: 15px;
 }
 
 .youtmain{
     width: 450px;
-    height: 600px;
+    height: 500px;
     text-align: center;
 }
 
@@ -24,23 +24,37 @@
     width: 200px;
     height: 200px;
     margin: 5px;
-    /*border: 3px solid #c99;*/
+    padding : 1px 1px 1px 1px;
     background-image: linear-gradient(#594BC2, #6A3AB2, #A23B92, #C93E74, #D84C5A, #E66A3E, #EE8941, #F5C364);
     -webkit-background-clip: border;
-    /*color: transparent;*/
     background-position: center center;
     background-size: cover;
 }
+
+/*.inspic-section{*/    /* 사진 넣을 때 확인 */
+/*    background-color: white;*/
+/*    position: absolute; top:0; left: 0;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*}*/
 
 .youtpic{
     display: inline-block;
     width: 400px;
     height: 200px;
     margin: 5px;
+    padding : 1px 1px 1px 1px;
     background-color: #CC3D32;
     background-position: center center;
     background-size: cover;
 }
+
+/*.youtpic-section{*/
+/*    background-color: white;*/
+/*    position: absolute; top:0; left: 0;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*}*/
 
 .ins-body{
     flex: 1 1 auto;
@@ -49,11 +63,6 @@
     flex-basis: auto;
     height: 250px;
     width: 250px;
-    /*padding: 1.25rem;*/
-    /*padding-top: 1.25rem;*/
-    /*padding-right: 1.25rem;*/
-    /*padding-bottom: 1.25rem;*/
-    /*padding-left: 1.25rem;*/
 }
 
 .yout-body{
@@ -91,7 +100,6 @@
     top: 0;
     right: 0;
     text-align: center;
-    /*margin-bottom: 1rem;*/
 }
 
 .yout-title{
@@ -105,37 +113,21 @@
     font-weight: 600;
 }
 
-morePost{
-    width: 40px;
+.morePost{
+    width: 100px;
     height: 600px;
     float: left;
     position: static;
+    line-height: 600px;
 }
 
 input.morePost{
-    background: url("../img/plus.png") no-repeat;
-    width: 40px;
-    height: 40px;
+    background: url("src/main/web/WEB-INF/views/img/plus.png") no-repeat;
+    width: 60px;
+    height: 60px;
+    margin-left: 50px;
+    margin-top: 200px;
 }
-
-/*p {*/
-/*    margin-top: 0;*/
-/*    margin-bottom: 1rem;*/
-/*}*/
-
-/**, ::after, ::before {*/
-/*    box-sizing: border-box;*/
-/*}*/
-
-/*p {*/
-/*    display: block;*/
-/*    margin-block-start: 1em;*/
-/*    margin-block-end: 1em;*/
-/*    margin-inline-start: 0px;*/
-/*    margin-inline-end: 0px;*/
-/*}*/
-
-
 
 
 
