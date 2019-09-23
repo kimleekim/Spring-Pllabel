@@ -12,12 +12,10 @@ import org.webapp.service.ThirdPageImpl;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Properties;
 
 @Controller
 public class PageController {
@@ -38,8 +36,7 @@ public class PageController {
     @GetMapping("/")
     public String setMain(Model model) {
         List<String> top3_station = mainPage.getTOP3Station();
-//        top3_place = mainPage.getTOP3Place();
-        top3_place[0] = "포돈";
+        top3_place = mainPage.getTOP3Place();
         String[] top3_restaurant = mainPage.getTOP3Restaurant();
 
         model.addAttribute("top3_restaurant", top3_restaurant);
@@ -98,7 +95,6 @@ public class PageController {
 
     @RequestMapping(value = "/like", method = RequestMethod.GET, produces="text/plain;charset=UTF-8")
     public void updateLike(Model model) {
-        System.out.println("ddddddd");
         secondPage.updateLikeCNT(station);
         model.addAttribute("likecnt", secondPage.getLikeCNT(station));
     }

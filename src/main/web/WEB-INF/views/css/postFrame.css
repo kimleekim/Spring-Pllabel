@@ -13,8 +13,8 @@
     max-width: 100%;
     height: 600px;
     position: static;
-    margin-top: 50px;
-    margin-left: 50px;
+    padding-top: 70px;
+    margin-left: 100px;
     float: left;
 }
 
@@ -55,6 +55,9 @@
     width: 400px;
     height: 200px;
     margin: 5px;
+    text-align: center;
+    font-size: x-large;
+    color: white;
     padding : 1px 1px 1px 1px;
     background-color: #CC3D32;
     background-position: center center;
@@ -65,7 +68,7 @@
     padding-top: 2px;
     background-color: transparent;
     width: 396px;
-    height: 196px;
+    height: 167px;
 }
 
 .ins-body{
