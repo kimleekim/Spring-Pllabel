@@ -126,9 +126,9 @@ public class SecondPageImpl implements SecondPage {
     public Object[] showHotPost(String station, boolean isMorepage) {
         int POST_COUNT_TO_SHOW = 4;
 
-//        if (isMorepage) {
-//            POST_COUNT_TO_SHOW = 40;
-//        }
+        if (isMorepage) {
+            POST_COUNT_TO_SHOW = 40;
+        }
 
         Object[] returnPosts = new Object[POST_COUNT_TO_SHOW];
         Map<String, Object> param = new HashMap<>();
@@ -177,9 +177,9 @@ public class SecondPageImpl implements SecondPage {
     public Object[] showFoodPost(String station, boolean isMorepage) {
         int POST_COUNT_TO_SHOW = 4;
 
-//        if (isMorepage) {
-//            POST_COUNT_TO_SHOW = 40;
-//        }
+        if (isMorepage) {
+            POST_COUNT_TO_SHOW = 40;
+        }
 
         Object[] returnPosts = new Object[POST_COUNT_TO_SHOW];
         Map<String, Object> param = new HashMap<>();

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap');
+
 .doughnut-hashtag{
     width: 900px;
     height: 600px;
@@ -31,7 +33,7 @@
 }
 
 .graph-line{
-    width: 1350px;
+    /*width: 1400px;*/
     height: 600px;
     position: static;
     display: inline;

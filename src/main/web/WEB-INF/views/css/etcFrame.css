@@ -1,5 +1,16 @@
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap');
+
+body{
+    font-family: "Nanum Gothic";
+}
+
+.page-section{
+    height: 650px;
+    padding-top: 50px;
+}
+
 .title-section{
-    width: 1400px;
+    /*width: 1400px;*/
     height: 70px;
     position: static;
     padding-top: 25px;
@@ -20,6 +31,7 @@
     position: static;
     padding-top: 10px;
     float: left;
+    font-size: smaller;
 }
 
 .station-section{
