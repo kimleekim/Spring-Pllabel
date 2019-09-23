@@ -27,11 +27,12 @@ function postFrame(index, post, id, count) {
         newDiv.setAttribute('class', 'youtmain');
         newDiv.setAttribute('style', 'float: left;');
         newDiv.innerHTML =
-            "<div class = \"youtpic\">" +
+            "<div class = \"youtpic\">▶" +
+            "<a href=\"" + post[6] + "\">" +
             "<img class = \"youtpic-section\"" +
             "src=\"" + post[0] +
             " \" alt=\"postImage\">\n" +
-            "</div>\n" +
+            "</a>\n" + "</div>\n" +
             "<div class = \"yout-body\">\n" +
             "<div class = \"yout-title\">" +
             post[1] +
