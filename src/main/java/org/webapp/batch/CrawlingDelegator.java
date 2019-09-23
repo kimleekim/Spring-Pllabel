@@ -15,24 +15,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CrawlingDelegator<T> {
+public class CrawlingDelegator<T> extends FindMyRestaurantsInList {
     private static final Logger logger = LoggerFactory.getLogger(CrawlingDelegator.class);
+    private static final String DIRECTORY_PATH = "/Users/neossmac/IdeaProjects/pllabel";
     private String photoUrl;
     private FileDelete fileDelete;
     private LocationStepsDataShareBean dataShareBean;
+    private List<String> restaurants;
 
     @Autowired
     public void setFileDelete(FileDelete fileDelete) {
         this.fileDelete = fileDelete;
     }
 
+    public void setRestaurants(List<String> restaurants) {
+        this.restaurants = restaurants;
+    }
+
     public void setDataShareBean(LocationStepsDataShareBean dataShareBean) {
         this.dataShareBean = dataShareBean;
     }
 
-    protected ArrayList<T> setS3ImageUrl(InstaCrawlImpl crawl,
-                                      WebDriver driver,
-                                      Map<T, String> photoPageLinks) throws Exception {
+    protected ArrayList<T> setS3ImageUrlAndPost(InstaCrawlImpl crawl,
+                                                WebDriver driver,
+                                                Map<T, String> photoPageLinks) throws Exception {
 
         ArrayList<T> returnList = new ArrayList<>();
 
@@ -52,11 +58,22 @@ public class CrawlingDelegator<T> {
                     break;
 
             }
+            else if(object instanceof Instafood) {
+                photoUrl = crawl.getPhotoURL(driver, ((Instafood) object).getStation(), photoPageLinks.get(object));
+                String post = crawl.getPost(driver);
+                List<String> myRestaurants = super.computingMyRestaurants(this.restaurants, new ArrayList<>(), post);
 
-            // Instafood의 경우 추가하기
+                if(!photoUrl.equals("") && myRestaurants.size()!=0) {
+                    ((Instafood) object).setMyRestaurant(myRestaurants);
+                    ((Instafood) object).setPost(post);
+                    ((Instafood) object).setPhotoURL(photoUrl);
+
+                    returnList.add(object);
+                }
+            }
         }
 
-        fileDelete.deleteFiles("/Users/neossmac/IdeaProjects/pllabel", ".jpg");
+        fileDelete.deleteFiles(DIRECTORY_PATH, ".jpg");
 
         return returnList;
     }

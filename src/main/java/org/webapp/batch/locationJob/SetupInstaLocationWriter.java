@@ -10,6 +10,7 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.webapp.batch.OldDataDeleter;
 import org.webapp.model.Instaplace;
 
 import javax.sql.DataSource;
