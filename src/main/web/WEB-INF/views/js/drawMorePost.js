@@ -1,4 +1,4 @@
-$.getScript('/static/js/postFrame.js', function morePost(post) {
+function morePost(post) {
     var count = 1;
 
     for (i = 0; i < 40; i = i + 4) {
@@ -16,4 +16,4 @@ $.getScript('/static/js/postFrame.js', function morePost(post) {
             count++;
         }
     }
-});
+}

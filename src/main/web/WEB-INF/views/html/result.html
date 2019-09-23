@@ -14,66 +14,74 @@
     <title>Result</title>
 </head>
 <body>
-    <div class="title-section">
-    <!--/*@thymesVar id="station" type="org.webapp.controller.PageController"*/-->
-    <div class="station-section" th:text="${station}">station</div>
-    <div class="text-section">에 대한 검색결과</div>
-    <div class="withwho-section">
-        <!--/*@thymesVar id="withwho" type="org.webapp.controller.PageController"*/-->
-        <div class="withwho-first">많은 사람들이&nbsp;</div>
-        <div class="withwho-second" th:text="${withwho}">withwho</div>
-        <div class="withwho-third">와(과) 주로 방문하는 곳입니다.</div>
-    </div>
-    <div class="button-section">
-        <!--        &lt;!&ndash;/*@thymesVar id="likecnt" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
-        <!--        <input class="like" type="button" value="좋아요" style="float:left;" onclick="">-->
-        <!--        <div class="like-value-section" th:text="${likecnt}">like</div>-->
-        <a class="goback" href="/" style="color: #999999; text-decoration-color: #999999;">초기 화면으로</a>
-    </div>
-</div>
+    <header class="title-section">
+        <!--/*@thymesVar id="station" type="org.webapp.controller.PageController"*/-->
+        <div class="station-section" th:text="${station}">station</div>
+        <div class="text-section">에 대한 검색결과</div>
+        <div class="withwho-section">
+            <!--/*@thymesVar id="withwho" type="org.webapp.controller.PageController"*/-->
+            <div class="withwho-first">많은 사람들이&nbsp;</div>
+            <div class="withwho-second" th:text="${withwho}">withwho</div>
+            <div class="withwho-third">와(과) 주로 방문하는 곳입니다.</div>
+        </div>
+        <div class="button-section">
+            <!--        &lt;!&ndash;/*@thymesVar id="likecnt" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
+            <!--        <input class="like" type="button" value="좋아요" style="float:left;" onclick="">-->
+            <!--        <div class="like-value-section" th:text="${likecnt}">like</div>-->
+            <a class="goback" href="/">초기 화면으로</a>
+        </div>
+    </header>
 
     <div class="page-section" style="background-color: lavender;">
-                <div class = "postLine" layout:fragment="content">
-                    <div class="category">핫플레이스</div>
-                    <div id="container_hotPost">
-                        <script th:inline="javascript">
-                            /*<![CDATA[*/
-                            var hotplace = /*[[${hotPost}]]*/;
-                            /*]]>*/
-                            for (i = 0; i < 4; i++) {
-                                postFrame(i, hotplace[i], 'container_hotPost', 1);
-                            }
-                        </script>
-                    </div>
-                </div>
-                <div class="morePost">
-                    <form action="/moreplace" method="POST" id="morePlace">
-                        <input type="submit" value="더보기" class="morePost">
-                    </form>
-                </div>
+        <div class = "postLine" layout:fragment="content">
+            <div class="category-section">
+                <div class="category" style="float: left;">핫플레이스</div>
+                <img style="float: left;" src="/static/css/iconmonstr-location-3-24.png">
+                <!--/*@thymesVar id="topPlace" type="org.webapp.controller.PageController"*/-->
+                <div class="topPlace" th:text="${topPlace}">topPlace</div>
             </div>
+
+            <div id="container_hotPost">
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var hotplace = /*[[${hotPost}]]*/;
+                    /*]]>*/
+                    for (i = 0; i < 4; i++) {
+                        postFrame(i, hotplace[i], 'container_hotPost', 0);
+                    }
+                </script>
+            </div>
+        </div>
+        <div class="morePost">
+            <form action="/moreplace" method="POST" id="morePlace">
+                <input type="submit" value="더보기" class="morePost">
+            </form>
+        </div>
+    </div>
+
     <div class="page-section">
-                <div class = "postLine" layout:fragment="content">
-                    <div class="category">핫푸드</div>
-                    <div class="postLine" layout:fragment="content">
-                        <div id="container_foodPost">
-                            <script th:inline="javascript">
-                                /*<![CDATA[*/
-                                var hotfood = /*[[${foodPost}]]*/;
-                                /*]]>*/
-                                for (i = 0; i < 4; i++) {
-                                    postFrame(i, hotfood[i], 'container_foodPost', 1);
-                                }
-                            </script>
-                        </div>
-                    </div>
-                </div>
-                <div class="morePost">
-                    <form action="/morefood" method="POST" id="moreFood">
-                        <input type="submit" value="더보기" class="morePost">
-                    </form>
-                </div>
+        <div class = "postLine" layout:fragment="content">
+            <div class="category">핫푸드</div>
+            <div id="container_foodPost">
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var hotfood = /*[[${foodPost}]]*/;
+                    /*]]>*/
+                    for (i = 0; i < 4; i++) {
+                        postFrame(i, hotfood[i], 'container_foodPost', 0);
+                    }
+                </script>
             </div>
+        </div>
+        <div class="morePost">
+            <form action="/morefood" method="POST" id="moreFood">
+                <input type="submit" value="더보기" class="morePost">
+            </form>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 50px; position: static;"></div>
+
     <div class="page-section" style="background-color: lavender;">
                 <div class = "postLine">
                     <div class="category">연관 해시태그 TOP10</div>
@@ -142,7 +150,12 @@
                     </div>
                 </div>
             </div>
-
+    <div style="font-size: x-small;">
+        Icons made by
+        <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a>
+        from
+        <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+    </div>
     <!--p>핫플 표시</p>
     <div id="staticMap" style="width:500px;height:400px;"></div>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey="></script>

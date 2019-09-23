@@ -8,7 +8,8 @@ function drawRanking(hashtags, id) {
 
         var rankTd=document.createElement('td');
         rankTd.setAttribute("id", "ranking"+rank.toString());
-        rankTd.setAttribute("style", "height: 40px;");
+        rankTd.setAttribute("style", "height: 40px; text-align: center;");
+        rankTd.innerHTML = rank.toString();
         document.getElementById("rankedRow"+rank.toString()).appendChild(rankTd);
 
         var tagTd=document.createElement('td');

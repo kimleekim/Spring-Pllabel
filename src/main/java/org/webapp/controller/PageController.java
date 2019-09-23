@@ -28,6 +28,7 @@ public class PageController {
     @Resource(name = "thirdpageservice")
     private ThirdPageImpl thirdPage;
     private String station = "";
+    private String[] top3_place = new String[3];
 
     @GetMapping("/intro")
     public String setIntro() {
@@ -37,7 +38,8 @@ public class PageController {
     @GetMapping("/")
     public String setMain(Model model) {
         List<String> top3_station = mainPage.getTOP3Station();
-        String[] top3_place = mainPage.getTOP3Place();
+//        top3_place = mainPage.getTOP3Place();
+        top3_place[0] = "포돈";
         String[] top3_restaurant = mainPage.getTOP3Restaurant();
 
         model.addAttribute("top3_restaurant", top3_restaurant);
@@ -68,6 +70,7 @@ public class PageController {
             model.addAttribute("likecnt", secondPage.getLikeCNT(station));
             model.addAttribute("withwho", secondPage.withWho(station));
             model.addAttribute("hotPost", secondPage.showHotPost(station, false));
+            model.addAttribute("topPlace", top3_place[0]);
             model.addAttribute("foodPost", secondPage.showFoodPost(station, false));
 
             model.addAttribute("top10_hashtag", thirdPage.getRelatedHashtags(station));
