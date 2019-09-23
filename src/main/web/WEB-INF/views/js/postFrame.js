@@ -1,7 +1,7 @@
 function postFrame(index, post, id, count) {
-    var youtubeCheck = 3;
+    var youtubecheck = 3 + count*4;
 
-    if (index != youtubeCheck * count) {
+    if (index != youtubecheck) {
         var newDiv=document.createElement('div');
         newDiv.setAttribute('class', 'insmain');
         newDiv.setAttribute('style', 'float: left;');
@@ -54,5 +54,34 @@ function postFrame(index, post, id, count) {
             "</div>\n" +
             "</div>";
         document.getElementById(id).appendChild(newDiv);
+    }
+}
+
+function morePost(post) {
+    var count = 0;
+
+    for (i = 0; i < 40; i = i + 4) {
+        var newDiv = document.createElement('div');
+        newDiv.setAttribute('class', 'page-section');
+        if ((i / 4) % 2 == 0 ) {
+            newDiv.setAttribute('style', "background-color: lavender;");
+        }
+        document.getElementsByTagName('body')[0].appendChild(newDiv);
+
+        newDiv=document.createElement('div');
+        newDiv.setAttribute('class', 'morePostLine');
+        newDiv.setAttribute('id', 'postLine' + i.toString());
+        newDiv.setAttribute('style', 'float: left;');
+        document.getElementsByClassName('page-section')[i / 4].appendChild(newDiv);
+
+        newDiv = document.createElement('div');
+        newDiv.setAttribute('id', 'container_morePost' + i.toString());
+        newDiv.setAttribute('layout:fragment', 'content');
+        document.getElementById('postLine' + i.toString()).appendChild(newDiv);
+
+        for (j = i; j < i + 4; j++) {
+            postFrame(j, post[j], 'container_morePost' + i.toString(), count);
+        }
+        count++;
     }
 }
