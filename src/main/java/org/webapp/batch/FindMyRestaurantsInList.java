@@ -3,6 +3,7 @@ package org.webapp.batch;
 import java.util.List;
 import java.util.StringTokenizer;
 
+
 public class FindMyRestaurantsInList {
 
     protected List<String> computingMyRestaurants(List<String> restaurants, List<String> myRestaurants, String post) {

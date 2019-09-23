@@ -1,4 +1,4 @@
-package org.webapp.batch.locationJob;
+package org.webapp.batch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 
-@Component
-class OldDataDeleter {
+@Component("OldTableDataDeleter")
+public class OldDataDeleter {
 
     private static final Logger logger = LoggerFactory.getLogger(OldDataDeleter.class);
     private DataSource dataSource;
@@ -26,5 +26,14 @@ class OldDataDeleter {
         sql = "DELETE FROM instaplace WHERE instaplace.date < date_add(now(), interval -3 month)";
 
         jdbcTemplate.update(sql);
+    }
+
+    protected void deleteFoodBeforeTwoMonths() {
+        logger.info("[FindHotFoodJob] : DeleteFoodBeforeTwoMonths-SuperMethod started.");
+
+        String foodSql;
+        foodSql = "DELETE FROM instafood WHERE instafood.date < date_add(now(), interval -2 month)";
+
+        jdbcTemplate.update(foodSql);
     }
 }
