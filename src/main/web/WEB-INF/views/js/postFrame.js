@@ -1,5 +1,7 @@
-function postFrame(index, post, id) {
-    if (index != 3) {
+function postFrame(index, post, id, count) {
+    var youtubeCheck = 3;
+
+    if (index != youtubeCheck * count) {
         var newDiv=document.createElement('div');
         newDiv.setAttribute('class', 'insmain');
         newDiv.setAttribute('style', 'float: left;');

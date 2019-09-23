@@ -2,20 +2,24 @@
 <head layout:fragment="content">
     <meta charset="UTF-8">
     <script src="/static/js/postFrame.js"></script>
+    <script src="/static/js/drawMorePost.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/etcFrame.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/postFrame.css">
     <title>More post</title>
 </head>
 <body>
-<h1>더보기 페이지</h1>
-<input type="button" onclick="history.go(-1);" value="이전 화면으로">
-<div layout:fragment="content" id="container_morePost" style="border:0.2px solid gray">
+    <div class="title-section">
+        <div class="text-section">더보기</div>
+        <div class="button-section">
+            <a class="goback" href="javascript:history.go(-1);" style="color: #999999; text-decoration-color: #999999;">이전 화면으로</a>
+        </div>
+    </div>
+
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var morepost = /*[[${morePost}]]*/;
+        var moreplace = /*[[${morePost}]]*/;
         /*]]>*/
-        for (i = 0; i < 4; i++) {   //4를 40으로
-            postFrame(i, morepost[i], 'container_morePost');
-        }
+        morePost(moreplace);
     </script>
-</div>
 </body>
 </html>
