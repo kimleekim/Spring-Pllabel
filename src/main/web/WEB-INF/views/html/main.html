@@ -1,113 +1,94 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="/static/css/test.css">
-        <title>Welcome to Pllabel!</title>
+        <meta charset="UTF-8">      
+        <title>Place and your Life Ballence</title>
+        <link rel = "stylesheet" href="/static/css/searchBar.css">
+        <script src="/static/js/theme.js"></script>
+        <link rel="stylesheet" type="text/css" href="/static/css/theme.css" />
+
 </head>
 <body>
 
-//https://codepen.io/mihaeltomic/pen/vmwMdm
+        <div class="container">
+            <h1>Pllabel</h1>
+        </div>
 
-<h2>main 페이지!</h2>
-<form action="/" method="POST" id="stationSearch">
-        <div>지하철역 : <input type="text" name="station" value=""></div>
-        <input type="submit" value="검색"/>
-</form>
-<h4>맛집 랭킹 3위</h4>
-<table>
-        <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->
-        <tr th:each="restaurant : ${top3_restaurant}">
-            <td th:text="${restaurant}">restaurant</td>
-        </tr>
-</table>
-<h4>핫플 랭킹 3위</h4>
-<table>
-        <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
-        <tr th:each="place : ${top3_place}">
-            <td th:text="${place}">place</td>
-        </tr>
-</table>
-<h4>실시간 랭킹 3위</h4>
-<table>
-        <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
-        <tr th:each="station : ${top3_station}">
-            <td th:text="${station}">station</td>
-        </tr>
-</table>
+
+       <form action="/" method = "POST" id = "stationSearch" class="search-container">
+            <input ype="text" name = "station" value="" id="search-bar" placeholder="지역, 지하철 역을 입력하세요">
+            <a href="#"><img class="search-icon" input type="submit" src="http://www.endlessicons.com/wp-content/uploads/2012/12/search-icon.png"></a>
+        </form>
+
+
+        <div class="content container2 col box center" style="float:left">
+<!--        <div id = "box1" class = "col box row content container2"  >-->
+<!--            style="float:left;">-->
+        <h4>맛집 Top 3 </h4>
+            <table>
+                    <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->
+                    <tr th:each="restaurant : ${top3_restaurant}">
+                        <td th:text="${restaurant}">restaurant</td>
+                    </tr>
+            </table>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </div>
+
+        <div class="content container2 col box center" style="float:left">
+<!--        <div id = "box2" class = "col box row content container2">-->
+<!--            style="float:left;">-->
+            <h4>핫 플레이스 Top 3 </h4>
+
+            <table>
+                    <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
+                    <tr th:each="place : ${top3_place}">
+                        <td th:text="${place}">place</td>
+                    </tr>
+            </table>
+
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse
+                    cillum dolore eu fugiat nulla pariatur.
+        </div>
+
+        <div class="content container2 col box center" style="float:left">
+<!--        <div id = "box3" class = "col box row content container2" >-->
+<!--            style="float:left">-->
+        <h4>실시간 랭킹 Top 3</h4>
+            <table>
+                    <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
+                    <tr th:each="station : ${top3_station}">
+                        <td th:text="${station}">station</td>
+                    </tr>
+            </table>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non.
+        </div>
+
+        <div style="position: absolute; left: 400px; top: 700px;">
+
+        <div id="footer" ;class="container">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        </div>
+
+        <div class="container">
+            <button onClick="userTheme(true);">Theme Change</button>
+        </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
 
-
-
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org" class="no-js" xmlns:layout="http://www.thymeleaf.org">-->
-<!--<head layout:fragment=“content”>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <link rel="stylesheet" href="/static/css/test.css">-->
-<!--    <title>Welcome to Pllabel</title>-->
-<!--&lt;!&ndash;    시작 페이지&ndash;&gt;-->
-<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Text Opening Sequence with CSS Animations</title>-->
-<!--    <meta name="description" content="Text Opening Sequence with CSS Animations" />-->
-<!--    <meta name="keywords" content="text, opening sequence, opening credits, css animations, typography, lettering.js" />-->
-<!--    <meta name="author" content="Codrops" />-->
-<!--    <link rel="shortcut icon" href="../favicon.ico">-->
-<!--    <link rel="stylesheet" type="text/css" href="/static/css/default.css" />-->
-<!--    <link rel="stylesheet" type="text/css" href="/static/css/component.css" />-->
-<!--    <script src="/static/js/modernizr.custom.js"></script>-->
-<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
-<!--    <script src="js/jquery.lettering.js"></script>-->
-<!--</head>-->
-<!--<body>-->
-<!--<div class="container">-->
-<!--    <div class="os-phrases" id="os-phrases">-->
-<!--        &lt;!&ndash; <h2>Sometimes it's better</h2>-->
-<!--        <h2>to hide</h2>-->
-<!--        <h2>in order to</h2>-->
-<!--        <h2>survive evil</h2>-->
-<!--        <h2>Thanatos</h2>-->
-<!--        <h2>This fall</h2>-->
-<!--        <h2>Prepare</h2>-->
-<!--        <h2>Refresh to replay</h2> &ndash;&gt;-->
-<!--        <h2>Place & Your Life Ballence</h2>-->
-<!--        <h2>PLLABEL</h2>-->
-<!--        <input type = "button" name = "start" value = "시작하기">-->
-<!--    </div>-->
-<!--</div>&lt;!&ndash; /container &ndash;&gt;-->
-
-<!--<script th:inline="javascript">-->
-<!--    $(document).ready(function() {-->
-<!--        $("#os-phrases > h2").lettering('words').children("span").lettering().children("span").lettering();-->
-<!--    })-->
-<!--</script>-->
-
-<!--<h2>main 페이지!</h2>-->
-<!--<form action="/" method="POST" id="stationSearch">-->
-<!--    <div>지하철역 : <input type="text" name="station" value=""></div>-->
-<!--    <input type="submit" value="검색"/>-->
-<!--</form>-->
-<!--<h4>맛집 랭킹 3위</h4>-->
-<!--<table>-->
-<!--    &lt;!&ndash;/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
-<!--    <tr th:each="restaurant : ${top3_restaurant}">-->
-<!--        <td th:text="${restaurant}">restaurant</td>-->
-<!--    </tr>-->
-<!--</table>-->
-<!--<h4>핫플 랭킹 3위</h4>-->
-<!--<table>-->
-<!--    &lt;!&ndash;/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
-<!--    <tr th:each="place : ${top3_place}">-->
-<!--        <td th:text="${place}">place</td>-->
-<!--    </tr>-->
-<!--</table>-->
-<!--<h4>실시간 랭킹 3위</h4>-->
-<!--<table>-->
-<!--    &lt;!&ndash;/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
-<!--    <tr th:each="station : ${top3_station}">-->
-<!--        <td th:text="${station}">station</td>-->
-<!--    </tr>-->
-<!--</table>-->
-<!--</body>-->
-<!--</html>-->

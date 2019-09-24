@@ -66,10 +66,13 @@
 	animation: OpeningSequence 5.2s linear forwards;
 }
 
+/*pllabel 두번째 부분*/
 .os-phrases h2:nth-child(2) > span > span > span {
 	-webkit-animation-delay: 5s;
 	-moz-animation-delay: 5s;
 	animation-delay: 5s;
+	font-size: 140px;
+	letter-spacing: 30px;
 }
 
 .os-phrases h2:nth-child(3) > span > span > span {
