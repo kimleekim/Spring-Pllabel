@@ -43,9 +43,10 @@ public class MainPageImpl implements MainPage {
     }
 
     public String setStationframe(String station) {
-        if (!station.substring(station.length() - 1).contains("역")) {
+        if (station.substring(station.length() - 1).contains("역")) {
             StringBuffer stringBuffer = new StringBuffer(station);
-            station += "역";
+            station = stringBuffer.deleteCharAt(station.length() - 1).toString();
+            System.out.println("*********" + station);
         }
         return station;
     }
