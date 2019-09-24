@@ -12,6 +12,11 @@ body{
     padding-top: 50px;
 }
 
+.more-page-section{
+    width: 100%;
+    height: auto;
+}
+
 .title-section{
     position: fixed;
     width: 100%;
@@ -28,12 +33,13 @@ body{
 }
 
 .withwho-section{
-    width: 500px;
-    height: 100px;
+    width: auto;
+    height: 200px;
+    margin-top: 50px;
+    margin-left: 270px;
+    text-align: right;
+    font-size: large;
     position: static;
-    padding-top: 10px;
-    float: left;
-    font-size: smaller;
 }
 
 .station-section{
@@ -63,22 +69,20 @@ body{
 }
 
 .withwho-first{
-    width: 200px;
-    height: 100px;
+    width: auto;
+    height: auto;
     float: left;
-    text-align: right;
 }
 
 .withwho-second{
-    width: 50px;
-    height: 100px;
+    width: auto;
+    height: auto;
     float: left;
-    text-align: center;
 }
 
 .withwho-third{
-    width: 200px;
-    height: 100px;
+    width: auto;
+    height: auto;
     float: left;
 }
 
