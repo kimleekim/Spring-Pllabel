@@ -63,17 +63,14 @@ function morePost(post) {
 
     for (i = 0; i < 40; i = i + 4) {
         var newDiv = document.createElement('div');
-        newDiv.setAttribute('class', 'page-section');
-        if ((i / 4) % 2 == 0 ) {
-            newDiv.setAttribute('style', "background-color: lavender;");
-        }
+        newDiv.setAttribute('class', 'more-page-section');
         document.getElementsByTagName('body')[0].appendChild(newDiv);
 
         newDiv=document.createElement('div');
         newDiv.setAttribute('class', 'morePostLine');
         newDiv.setAttribute('id', 'postLine' + i.toString());
         newDiv.setAttribute('style', 'float: left;');
-        document.getElementsByClassName('page-section')[i / 4].appendChild(newDiv);
+        document.getElementsByClassName('more-page-section')[i / 4].appendChild(newDiv);
 
         newDiv = document.createElement('div');
         newDiv.setAttribute('id', 'container_morePost' + i.toString());
