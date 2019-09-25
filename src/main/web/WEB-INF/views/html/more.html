@@ -1,21 +1,15 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
-//더보기 페이지
-
 <head layout:fragment="content">
     <meta charset="UTF-8">
     <script src="/static/js/postFrame.js"></script>
     <script src="/static/js/scrollAnim.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/etcFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/postFrame.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/font.css">
     <title>More post</title>
 </head>
 <body>
-<!--    <header class="title-section">-->
-<!--        <div class="station-section">더보기 페이지</div>-->
-<!--        <div class="button-section" style="margin-left: 600px;">-->
-            <a class="goback" href="javascript:history.go(-1);">이전 화면으로</a>
-<!--        </div>-->
-<!--    </header>-->
+    <div class="logo-font"><a class="goback" href="javascript:history.go(-1);" style="color: #34495e; text-decoration:none;">Pllabel</a></div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -23,5 +17,6 @@
         /*]]>*/
         morePost(moreplace);
     </script>
+
 </body>
 </html>

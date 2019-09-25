@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap');
 
-*{
+div{
     font-family: 'Noto Serif KR', serif;
 }
 
@@ -83,6 +83,7 @@
     flex-basis: auto;
     height: 250px;
     width: 250px;
+    font-size: 0.9rem;
 }
 
 .yout-body{
@@ -92,6 +93,7 @@
     flex-basis: auto;
     height: 250px;
     width: 450px;
+    font-size: 0.9rem;
 }
 
 .ins-text{
@@ -131,6 +133,7 @@
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     text-align: center;
+    font-size: 1rem;
     font-weight: 600;
 }
 
@@ -150,7 +153,7 @@ input.morePost{
     background-size: 65px 65px;
     width: 65px;
     height: 65px;
-    margin-top: 80px;
+    margin-top: 70px;
     border: none;
 }
 
@@ -161,6 +164,3 @@ input.morePost{
     margin-top: 5px;
     margin-left: 5px;
 }
-
-
-
