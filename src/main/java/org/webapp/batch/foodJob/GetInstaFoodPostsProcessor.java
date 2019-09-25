@@ -8,13 +8,10 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.webapp.batch.CrawlingDelegator;
-import org.webapp.batch.FindMyRestaurantsInList;
 import org.webapp.dataset.InstaCrawlImpl;
 import org.webapp.model.Instafood;
 import org.webapp.model.Overall;
-
 import java.sql.Date;
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -31,11 +28,8 @@ public class GetInstaFoodPostsProcessor extends CrawlingDelegator<Instafood>
     private InstaCrawlImpl instaCrawlImpl;
     private FoodStepsDataShareBean dataShareBean;
     private static String url = "https://www.instagram.com/explore/tags/";
-    private boolean checkFirst;
 
-    GetInstaFoodPostsProcessor() {
-        this.checkFirst = false;
-    }
+    GetInstaFoodPostsProcessor() {}
 
     @Autowired
     public GetInstaFoodPostsProcessor(InstaCrawlImpl instaCrawlImpl,
@@ -143,6 +137,7 @@ public class GetInstaFoodPostsProcessor extends CrawlingDelegator<Instafood>
             pageLinks.put(object, instaCrawlImpl.getPhotopageURL(webDriver));
         }
 
+        this.dataShareBean.addStation(station);
         super.setRestaurants(overall.getRestaurantsOfJson());
         objectList = super.setS3ImageUrlAndPost(instaCrawlImpl, webDriver, pageLinks);
 

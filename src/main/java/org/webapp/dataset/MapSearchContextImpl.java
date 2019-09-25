@@ -51,7 +51,7 @@ public class MapSearchContextImpl implements MapSerachContext {
             if (subway.get("station").equals("총신대입구")) {
                 continue;
             }
-            Thread.sleep(1500);
+
             WebElement searchArea = webDriver.findElement(By.xpath("//*[@id=\"search.keyword.query\"]"));
             searchArea.sendKeys(subway.get("station") + "역");
             searchArea.sendKeys(Keys.ENTER);
@@ -86,6 +86,7 @@ public class MapSearchContextImpl implements MapSerachContext {
         String toKnowPageChanged = null;
         List<WebElement> restaurantList;
         List<String> insertRestaurantList = new ArrayList<>();
+        int chance = 0;
 
         this.webDriver = chromeDriverContext.setupChromeDriver();
         this.webDriverWait = new WebDriverWait(this.webDriver, 20);
@@ -193,10 +194,18 @@ public class MapSearchContextImpl implements MapSerachContext {
                     break;
                 }
                 else {
+                    if(chance == 4) {
+                        break;
+                    }
                     totalCount--;
+                    chance ++;
                     continue;
                 }
             } catch (NoSuchElementException ee) {
+                if(chance == 4) {
+                    break;
+                }
+                chance++;
                 continue;
             }
             searchArea.clear();
@@ -258,7 +267,13 @@ public class MapSearchContextImpl implements MapSerachContext {
         By searchHeaderLocator;
 
         searchHeaderLocator = By.xpath("//*[@id=\"info.searchHeader.message\"]/div/div[1]/p");
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchHeaderLocator));
+        try {
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchHeaderLocator));
+        } catch(TimeoutException e) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) { }
+        }
         searchHeader = webDriver.findElement(searchHeaderLocator)
                 .getText();
         try {
