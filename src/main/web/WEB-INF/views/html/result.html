@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/etcFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/scrollAnim.css">
     <link rel="stylesheet" type="text/css" href="/statoc/css/font.css">
-    <link href="https://fonts.googleapis.com/css?family=Lobster|Do+Hyeon|Nanum+Gothic|Nanum+Myeongjo|Noto+Serif+KR|Noto+Sans+JP|Acme|Pacifico|Rubik&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Jua|Do+Hyeon|Nanum+Gothic|Nanum+Myeongjo|Noto+Serif+KR|Noto+Sans+JP|Acme|Pacifico|Rubik&display=swap" rel="stylesheet">
     <title>Pllabel</title>
 </head>
 
@@ -96,8 +96,8 @@
 <!--    3페이지-->
     <div class="page-section" style="background-color: white">
         <div class = "postLine">
-            <div class="category" style="text-size:80px">연관 해시태그 TOP10</div>
-            <br>
+            <div class="title-font category" style="text-size:80px">&nbsp;Related Hash Tag</div>
+            <br><br>
             <div style="width: 100%; height: 400px; position: static;">
                 <div class = "doughnut-hashtag">
                     <canvas layout:fragment="content" id="relatedHashtagChart" class="doughnut"/>
@@ -128,7 +128,7 @@
                 <!--/*@thymesVar id="withwho" type="org.webapp.controller.PageController"*/-->
                 <div class="withwho-first">많은 사람들이&nbsp;</div>
                 <div class="withwho-second" th:text="${withwho}">withwho</div>
-                <div class="withwho-third">와(과) 주로 방문하는 곳입니다.</div>
+                <div class="withwho-third ">와(과) 주로 방문하는 곳입니다.</div>
             </div>
         </div>
     </div>
@@ -137,8 +137,8 @@
     <div class="page-section" style="background-color: #ffd877;">
                 <div class = "graph-line">
                     <div class = "graph-hashtag">
-                        <div class="graph-title">요일별 방문 빈도</div>
-                        <br>
+                        <div class="graph-title title-font" style="text-size:90px">Visiters by Day</div>
+                        <br><br>
                         <canvas layout:fragment="content" id="byDayPostChart" class="chart"/>
                         <script th:inline="javascript">
                             /*<![CDATA[*/
@@ -154,8 +154,8 @@
                         </script>
                     </div>
                     <div class = "graph-hashtag">
-                        <div class="graph-title">이번주 방문 빈도</div>
-                        <br>
+                        <div class="graph-title title-font" style="text-size:90px">Frequency of this Week</div>
+                        <br><br>
                         <canvas id="thisWeekPostChart" class="chart"/>
                         <script th:inline="javascript">
                             /*<![CDATA[*/
@@ -172,12 +172,7 @@
                     </div>
                 </div>
             </div>
-    <div style="font-size: x-small;">
-        Icons made by
-        <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a>
-        from
-        <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
-    </div>
+
 
 </body>
 </html>
