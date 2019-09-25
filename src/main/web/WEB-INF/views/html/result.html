@@ -1,4 +1,5 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org">
+
 <head layout:fragment="content">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
@@ -11,26 +12,30 @@
     <link rel="stylesheet" type="text/css" href="/static/css/graphFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/etcFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/scrollAnim.css">
-    <title>Result</title>
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Noto+Sans+JP|Acme|Pacifico|Rubik&display=swap" rel="stylesheet">
+    <title>역에대한 검색결과</title>
 </head>
-<body>
+
+<body bgcolor = 'f1f1f1'>
+
     <header class="title-section">
         <!--/*@thymesVar id="station" type="org.webapp.controller.PageController"*/-->
-        <div class="station-section" th:text="${station}">station</div>
-        <div class="text-section">역에 대한 검색결과</div>
+        <div style="height: 10%; width: 100%">
+        <div class="station-section" style="color:#f1f1f1" th:text="${station}">station</div>
+        <div class="text-section" style="color:#f1f1f1"> &nbsp;역</div>
         <div class="button-section">
-            <!--        &lt;!&ndash;/*@thymesVar id="likecnt" type="org.webapp.controller.PageController"*/&ndash;&gt;-->
-            <!--        <input class="like" type="button" value="좋아요" style="float:left;" onclick="">-->
-            <!--        <div class="like-value-section" th:text="${likecnt}">like</div>-->
-            <a class="goback" href="/">초기 화면으로</a>
+<!--            <a class="goback" href="/">초기 화면으로</a>-->
+            <div class="logo-font"><a href="/" style="color: white; text-decoration:none">Pllabel</a></div>
         </div>
     </header>
+    </div>
 
-    <div class="page-section" style="background-color: lavender;">
+<!--1페이지-->
+    <div class="page-section" style="background-color: white">
         <div class = "postLine" layout:fragment="content">
             <div class="category-section">
-                <div class="category" style="float: left;">핫플레이스</div>
-                <img style="float: left;" src="/static/css/iconmonstr-location-3-24.png">
+                <div class="title-font category " style="float: left; text-size: 80px;">hot Place</div>
+                <img style="float: left;" src="/static/css/place.png"  width="50" height="50" >
                 <!--/*@thymesVar id="topPlace" type="org.webapp.controller.PageController"*/-->
                 <div class="topPlace" th:text="${topPlace}">topPlace</div>
             </div>
@@ -46,16 +51,18 @@
                 </script>
             </div>
         </div>
-        <div class="morePost">
+        <div class="morePost" >
             <form action="/moreplace" method="POST" id="morePlace">
                 <input type="submit" value="더보기" class="morePost">
             </form>
         </div>
     </div>
 
-    <div class="page-section">
+<!--    2페이지-->
+    <div class="page-section" style="background-color: #ffd877;">
         <div class = "postLine" layout:fragment="content">
-            <div class="category">핫푸드</div>
+            <div class="title-font category " style="text-size: 80px;">hot Food</div>
+            <img style="float: left;" src="/static/css/food.png" width="50" height="50" >
             <div id="container_foodPost">
                 <script th:inline="javascript">
                     /*<![CDATA[*/
@@ -76,9 +83,10 @@
 
     <div style="margin-bottom: 50px; position: static;"></div>
 
-    <div class="page-section" style="background-color: lavender;">
+<!--    3페이지-->
+    <div class="page-section" style="background-color: white">
         <div class = "postLine">
-            <div class="category">연관 해시태그 TOP10</div>
+            <div class="category" style="text-size:80px">연관 해시태그 TOP10</div>
             <br>
             <div style="width: 100%; height: 400px; position: static;">
                 <div class = "doughnut-hashtag">
@@ -115,7 +123,8 @@
         </div>
     </div>
 
-    <div class="page-section">
+<!--    4페이지-->
+    <div class="page-section" style="background-color: #ffd877;">
                 <div class = "graph-line">
                     <div class = "graph-hashtag">
                         <div class="graph-title">요일별 방문 빈도</div>
@@ -159,18 +168,6 @@
         from
         <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
     </div>
-    <!--p>핫플 표시</p>
-    <div id="staticMap" style="width:500px;height:400px;"></div>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey="></script>
-    <script th:inline="javascript">
-        var staticMapContainer  = document.getElementById('staticMap'), // 이미지 지도를 표시할 div
-            staticMapOption = {
-                // center: new kakao.maps.LatLng(33.450701, 126.570667),
-                level: 3
-            };
 
-        // 이미지 지도를 표시할 div와 옵션으로 이미지 지도를 생성합니다
-        var staticMap = new kakao.maps.StaticMap(staticMapContainer, staticMapOption);
-    </script-->
 </body>
 </html>
