@@ -61,9 +61,15 @@
 <!--    2페이지-->
     <div class="page-section" style="background-color: #ffd877;">
         <div class = "postLine" layout:fragment="content">
-            <div class="title-font category " style="text-size: 80px;">hot Food</div>
-            <img style="float: left;" src="/static/css/food.png" width="50" height="50" >
-            <div id="container_foodPost">
+
+<!--            <div class="title-font category " style="float: left;text-size: 80px; width: 150px;">hot Food</div>-->
+<!--            <img style="float: left;" src="/static/css/food.png" width="50" height="50" >-->
+<!--            <div id="container_foodPost">-->
+            <div class="category-section">
+                <div class="title-font category " style="float: left; text-size: 80px;">hot Food</div>
+                <img style="float: left;" src="/static/css/food.png"  width="50" height="50" >
+                <br><br><br>
+                <div id="container_foodPost">
                 <script th:inline="javascript">
                     /*<![CDATA[*/
                     var hotfood = /*[[${foodPost}]]*/;
@@ -71,9 +77,10 @@
                     for (i = 0; i < 4; i++) {
                         postFrame(i, hotfood[i], 'container_foodPost', 0);
                     }
-                </script>
+                </script> </div>
             </div>
-        </div>
+            </div>
+<!--    </div>-->
         <div class="morePost">
             <form action="/morefood" method="POST" id="moreFood">
                 <input type="submit" value="더보기" class="morePost">
