@@ -47,7 +47,7 @@ public class YoutubefoodDao extends Dao<Youtubefood> {
 
     @Override
     public List<Youtubefood> findByParam(Map<String, Object> parameter) {
-        sql = "select * from youtubefood where";
+        sql = "select * from youtubefood where ";
         List<Youtubefood> result;
 
         result = jdbcTemplate.query(selectTarget("youtubefood", parameter, sql)
