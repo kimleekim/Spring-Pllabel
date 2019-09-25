@@ -72,7 +72,7 @@ public class GetInstaFoodPostsProcessor extends CrawlingDelegator<Instafood>
             limitDate = Date.valueOf(ZonedDateTime
                                     .now()
                                     .withZoneSameInstant(zid)
-                                    .minusDays(4)
+                                    .minusMonths(2)
                                     .toLocalDate());
         }
         else {

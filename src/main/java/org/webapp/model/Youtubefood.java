@@ -5,6 +5,7 @@ import java.sql.Date;
 public class Youtubefood {
     private long key;
     private String station;
+    private String keyword;
     private String title;
     private String content;
     private long totalview;
@@ -13,9 +14,10 @@ public class Youtubefood {
     private String thumbnailURL;
     private String videoLink;
 
-    public Youtubefood (long key, String station, String title, String content, long totalview, String creator, Date date, String thumbnailURL, String videoLink) {
+    public Youtubefood (long key, String station, String keyword, String title, String content, long totalview, String creator, Date date, String thumbnailURL, String videoLink) {
         this.key = key;
         this.station = station;
+        this.keyword = keyword;
         this.title = title;
         this.content = content;
         this.totalview = totalview;
@@ -43,6 +45,14 @@ public class Youtubefood {
 
     public void setStation(String station) {
         this.station = station;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     public String getTitle() {

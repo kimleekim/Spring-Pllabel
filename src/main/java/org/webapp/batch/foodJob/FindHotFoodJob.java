@@ -25,6 +25,7 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.webapp.batch.BatchSettings;
 import org.webapp.model.Instafood;
 import org.webapp.model.Overall;
+import org.webapp.model.Youtubefood;
 
 import javax.sql.DataSource;
 import java.util.Collections;
@@ -69,8 +70,8 @@ public class FindHotFoodJob {
     public CronTriggerFactoryBean findHotFoodTrigger() throws Exception {
         return BatchSettings.cronTriggerFactoryBeanBuilder()
                 .name("FindHotFood-Trigger")
-                .cronExpression("0 0/2 * * * ?") // 1~2분마다
-                //.cronExpression("0 30 7 * * ? *")
+                //.cronExpression("0 0/2 * * * ?") for test
+                .cronExpression("0 30 7 * * ? *")
                 .jobDetailFactoryBean(findHotFoodJobSchedule())
                 .build();
     }
@@ -88,6 +89,7 @@ public class FindHotFoodJob {
                 .start(getLatestFoodDateStep())
                 .next(getInstaFoodPostsStep())
                 .next(mappingTop10RestaurantsStep())
+                .next(setupYoutubeHotFoodStep())
                 .build();
     }
 
@@ -176,5 +178,32 @@ public class FindHotFoodJob {
     @Bean
     public ItemWriter<Map<String, List<String>>> mappingTop10RestaurantsWriter() {
         return new MappingTop10RestaurantsWriter();
+    }
+
+    @Bean
+    @JobScope
+    public Step setupYoutubeHotFoodStep() {
+        return stepBuilderFactory.get(YOUTUBE_STEP_NAME)
+                .<Map.Entry<String, List<String>>, List<Youtubefood>>chunk(CHUNK_SIZE)
+                .reader(setupYoutubeHotFoodReader())
+                .processor(setupYoutubeHotFoodProcessor())
+                .writer(setupYoutubeHotFoodWriter())
+                .transactionManager(this.transactionManager)
+                .build();
+    }
+
+    @Bean(destroyMethod = "")
+    public SetupYoutubeHotFoodReader setupYoutubeHotFoodReader() {
+        return new SetupYoutubeHotFoodReader();
+    }
+
+    @Bean
+    public ItemProcessor<Map.Entry<String, List<String>>, List<Youtubefood>> setupYoutubeHotFoodProcessor() {
+        return new SetupYoutubeHotFoodProcessor();
+    }
+
+    @Bean
+    public ItemWriter<List<Youtubefood>> setupYoutubeHotFoodWriter() {
+        return new SetupYoutubeHotFoodWriter();
     }
 }

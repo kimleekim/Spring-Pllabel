@@ -32,12 +32,13 @@ import java.util.*;
 
 @Component
 public class YoutubeApiTrim {
-    private static long NUMBER_OF_VIDEOS_RETURNED = 5; //이 숫자만큼 db에 쌓임.
+    private static long NUMBER_OF_VIDEOS_RETURNED = 5;
     private static String PROPERTIES_FILENAME = "application.properties";
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static YouTube youtube;
-    private static String inputQuery;
+    private static String foodKeyword;
+
     @Autowired
     InstafoodDao instafoodDao;
     @Autowired
@@ -75,6 +76,7 @@ public class YoutubeApiTrim {
                 if (isFoodVideo == 1) {
                     food = new Youtubefood();
                     food.setStation(station);
+                    food.setKeyword(foodKeyword);
                     food.setTitle(singleVideo.getSnippet().getTitle());
                     food.setCreator(singleVideo.getSnippet().getChannelTitle());
                     food.setDate(java.sql.Date.valueOf(convertDateFormat(publishedDateTemp)));
@@ -174,7 +176,6 @@ public class YoutubeApiTrim {
     }
 
     public List<Object> SearchKeyword(String keyword, String station, int isFoodVideo) { //2면 hot
-        List<String> queryTerms;
         List<Object> returnVideoList = null;
         Properties properties = new Properties();
 
@@ -201,8 +202,8 @@ public class YoutubeApiTrim {
 
             if (isFoodVideo == 1) {
                 NUMBER_OF_VIDEOS_RETURNED = 1;
+                foodKeyword = keyword;
             }
-
             search.setQ(keyword); //setting search keyword.
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();

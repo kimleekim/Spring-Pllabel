@@ -27,10 +27,11 @@ public class YoutubefoodDao extends Dao<Youtubefood> {
     @Override
     public void save(Youtubefood youtubefood) {
         try {
-            String sql = "insert into youtubefood(station, title, content, totalview, creator, youtubefood.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "insert into youtubefood(station, keyword, title, content, totalview, creator, youtubefood.date, thumbnailURL, videoLink) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(sql,
                     youtubefood.getStation(),
+                    youtubefood.getKeyword(),
                     youtubefood.getTitle(),
                     youtubefood.getContent(),
                     youtubefood.getTotalview(),
@@ -46,7 +47,7 @@ public class YoutubefoodDao extends Dao<Youtubefood> {
 
     @Override
     public List<Youtubefood> findByParam(Map<String, Object> parameter) {
-        sql = "select * from youtubefood where ";
+        sql = "select * from youtubefood where";
         List<Youtubefood> result;
 
         result = jdbcTemplate.query(selectTarget("youtubefood", parameter, sql)

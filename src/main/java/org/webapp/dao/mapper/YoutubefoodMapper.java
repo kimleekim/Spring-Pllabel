@@ -13,6 +13,7 @@ public class YoutubefoodMapper implements RowMapper<Youtubefood> {
 
         youtubefood.setKey(rs.getInt("key"));
         youtubefood.setStation(rs.getString("station"));
+        youtubefood.setKeyword(rs.getString("keyword"));
         youtubefood.setTitle(rs.getString("title"));
         youtubefood.setContent(rs.getString("content"));
         youtubefood.setTotalview(rs.getLong("totalview"));

@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class FoodStepsDataShareBean {
@@ -68,12 +65,12 @@ public class FoodStepsDataShareBean {
         return this.stations;
     }
 
-    public List<String> getTop10RestaurantsPerStation(String station) {
+    public Map<String, List<String>> getTop10RestaurantsPerStation() {
         if(this.top10RestaurantsPerStation == null) {
             logger.error("top10RestaurantsPerStation-Map is not initialized.");
             return null;
         }
 
-        return this.top10RestaurantsPerStation.get(station);
+        return this.top10RestaurantsPerStation;
     }
 }
