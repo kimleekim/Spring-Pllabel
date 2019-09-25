@@ -45,33 +45,8 @@ public class YoutubeApiTrim {
     @Autowired
     S3Connector s3Connector;
 
-    YoutubeApiTrim() {
-    }
+    YoutubeApiTrim() {}
 
-    private List<String> getInputQuery(String keyword, int isFoodVideo) {
-        Map<String, Object> parameter = new HashMap<>();
-        List<String> keywords = new ArrayList<>();
-
-        if (isFoodVideo == 1) {
-            NUMBER_OF_VIDEOS_RETURNED = 1;
-            parameter.put("station", keyword);
-            List<Instafood> instafoods = instafoodDao.findByParam(parameter);
-
-            for (Instafood instafood : instafoods) {
-                inputQuery = instafood.getStation() + " ";
-                List<String> restaurants = instafood.getMyRestaurantOfJson();
-                for (String restaurant : restaurants) {
-                    inputQuery += restaurant;
-                    if (!keywords.contains(inputQuery)) {
-                        keywords.add(inputQuery);
-                    }
-                }
-            }
-            return keywords;
-        }
-
-        return keywords;
-    }
 
     private List<Object> insertVideoData (Iterator<SearchResult> iteratorSearchResults,
                                           String station,
@@ -224,24 +199,14 @@ public class YoutubeApiTrim {
             search.setFields("items(id/kind,id/videoId,snippet/title,snippet/channelTitle,snippet/publishedAt,snippet/thumbnails/default/url)");
             search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
-            if (isFoodVideo == 2) {
-                search.setQ(keyword); //setting search keyword.
-                SearchListResponse searchResponse = search.execute();
-                List<SearchResult> searchResultList = searchResponse.getItems();
-                returnVideoList = insertResult(searchResultList, station, properties, isFoodVideo);
+            if (isFoodVideo == 1) {
+                NUMBER_OF_VIDEOS_RETURNED = 1;
             }
-            else if (isFoodVideo == 1) {
-                queryTerms = getInputQuery(keyword, isFoodVideo);
-                returnVideoList = new ArrayList<>();
 
-                for (String queryTerm : queryTerms) {
-                    search.setQ(queryTerm);
-                    SearchListResponse searchResponse = search.execute();
-                    List<SearchResult> searchResultList = searchResponse.getItems();
-                    returnVideoList.add(insertResult(searchResultList, station, properties, isFoodVideo));
-                }
-
-            }
+            search.setQ(keyword); //setting search keyword.
+            SearchListResponse searchResponse = search.execute();
+            List<SearchResult> searchResultList = searchResponse.getItems();
+            returnVideoList = insertResult(searchResultList, station, properties, isFoodVideo);
 
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "

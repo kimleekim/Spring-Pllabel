@@ -6,10 +6,13 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,7 @@ public class FindHotFoodJob {
     private static final String JOB_NAME = "findHotFood-Job";
     private static final String READ_STEP_NAME = "getLatestFoodDate-Step";
     private static final String INSTAGRAM_STEP_NAME = "getInstaFoodPosts-Step";
+    private static final String COMPUTING_STEP_NAME = "mappingTop10Restaurants-Step";
     private static final String YOUTUBE_STEP_NAME = "setupYoutubeHotFood-Step";
     private static final int CHUNK_SIZE = 1;
 
@@ -66,6 +70,7 @@ public class FindHotFoodJob {
         return BatchSettings.cronTriggerFactoryBeanBuilder()
                 .name("FindHotFood-Trigger")
                 .cronExpression("0 0/2 * * * ?") // 1~2분마다
+                //.cronExpression("0 30 7 * * ? *")
                 .jobDetailFactoryBean(findHotFoodJobSchedule())
                 .build();
     }
@@ -82,6 +87,7 @@ public class FindHotFoodJob {
         return jobBuilderFactory.get(JOB_NAME)
                 .start(getLatestFoodDateStep())
                 .next(getInstaFoodPostsStep())
+                .next(mappingTop10RestaurantsStep())
                 .build();
     }
 
@@ -144,4 +150,31 @@ public class FindHotFoodJob {
         return new GetInstaFoodPostsWriter();
     }
 
+    @Bean
+    @JobScope
+    public Step mappingTop10RestaurantsStep() {
+        return stepBuilderFactory.get(COMPUTING_STEP_NAME)
+                .<String, Map<String, List<String>>>chunk(CHUNK_SIZE)
+                .reader(mappingTop10RestaurantsReader())
+                .processor(mappingTop10RestaurantsProcessor())
+                .writer(mappingTop10RestaurantsWriter())
+                .transactionManager(this.transactionManager)
+                .build();
+    }
+
+    @Bean(destroyMethod = "")
+    @StepScope
+    public ItemReader<String> mappingTop10RestaurantsReader() {
+        return new MappingTop10RestaurantsReader();
+    }
+
+    @Bean
+    public ItemProcessor<String, Map<String, List<String>>> mappingTop10RestaurantsProcessor() {
+        return new MappingTop10RestaurantsProcessor();
+    }
+
+    @Bean
+    public ItemWriter<Map<String, List<String>>> mappingTop10RestaurantsWriter() {
+        return new MappingTop10RestaurantsWriter();
+    }
 }
