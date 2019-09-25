@@ -81,6 +81,10 @@ public class Instafood {
         }
     }
 
+    public void setMyRestaurantForString(Object myRestaurant) {
+        this.myRestaurant = (String)myRestaurant;
+    }
+
     public String getMyRestaurant() {
         return myRestaurant;
     }
@@ -102,7 +106,8 @@ public class Instafood {
 
         } catch(StringIndexOutOfBoundsException
                 | IllegalStateException
-                | JsonSyntaxException e) {
+                | JsonSyntaxException
+                | NullPointerException e) {
 
             tempArray = gson.fromJson(getMyRestaurant(), String[].class);
             toJavaObject = new ArrayList<>(Arrays.asList(tempArray));
