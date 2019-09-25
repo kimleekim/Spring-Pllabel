@@ -12,8 +12,9 @@
     <link rel="stylesheet" type="text/css" href="/static/css/graphFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/etcFrame.css">
     <link rel="stylesheet" type="text/css" href="/static/css/scrollAnim.css">
-    <link href="https://fonts.googleapis.com/css?family=Lobster|Noto+Sans+JP|Acme|Pacifico|Rubik&display=swap" rel="stylesheet">
-    <title>역에대한 검색결과</title>
+    <link rel="stylesheet" type="text/css" href="/statoc/css/font.css">
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Do+Hyeon|Nanum+Gothic|Nanum+Myeongjo|Noto+Serif+KR|Noto+Sans+JP|Acme|Pacifico|Rubik&display=swap" rel="stylesheet">
+    <title>Pllabel</title>
 </head>
 
 <body bgcolor = 'f1f1f1'>
@@ -21,8 +22,8 @@
     <header class="title-section">
         <!--/*@thymesVar id="station" type="org.webapp.controller.PageController"*/-->
         <div style="height: 10%; width: 100%">
-        <div class="station-section" style="color:#f1f1f1" th:text="${station}">station</div>
-        <div class="text-section" style="color:#f1f1f1"> &nbsp;역</div>
+        <div class="station-section formal-text" style="color:#f1f1f1" th:text="${station}">station</div>
+        <div class="text-section formal-text" style="color:#f1f1f1"> &nbsp;역</div>
         <div class="button-section">
 <!--            <a class="goback" href="/">초기 화면으로</a>-->
             <div class="logo-font"><a href="/" style="color: white; text-decoration:none">Pllabel</a></div>
@@ -51,11 +52,13 @@
                 </script>
             </div>
         </div>
+
         <div class="morePost" >
             <form action="/moreplace" method="POST" id="morePlace">
                 <input type="submit" value="더보기" class="morePost">
             </form>
         </div>
+
     </div>
 
 <!--    2페이지-->

@@ -37,19 +37,16 @@ function postFrame(index, post, id, count) {
             "<div class = \"yout-title\">" +
             post[1] +
             "</div>" +
-            "<div class = \"text-date\">" +
-            "created by&nbsp;" +
-            post[4] +
-            "</div>" +
-            "<br>" +
-            "<div class = \"text-date\">" +
-            post[5] +
-            "&nbsp;views" +
-            "</div>" +
             "<div class = \"yout-text\">\n" +
             post[2] +
             "</div>\n" +
             "<div class = \"text-date\">" +
+            "created by&nbsp;" +
+            post[4] +
+            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+            post[5] +
+            "&nbsp;views" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
             post[3] +
             "</div>\n" +
             "</div>\n" +
