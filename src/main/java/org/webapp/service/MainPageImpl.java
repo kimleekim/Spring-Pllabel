@@ -46,7 +46,6 @@ public class MainPageImpl implements MainPage {
         if (station.substring(station.length() - 1).contains("역")) {
             StringBuffer stringBuffer = new StringBuffer(station);
             station = stringBuffer.deleteCharAt(station.length() - 1).toString();
-            System.out.println("*********" + station);
         }
         return station;
     }

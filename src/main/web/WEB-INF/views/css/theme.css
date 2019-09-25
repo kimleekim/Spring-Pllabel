@@ -130,6 +130,13 @@ td{
     text-align: center;
 }
 
-h1{
+.font-pllabel{
+    font-family: 'Rubik', sans-serif;
 }
 
+.line{
+    color: red;
+    width: auto;
+    height: auto;
+    text-align: center;
+}
