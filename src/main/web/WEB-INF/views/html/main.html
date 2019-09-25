@@ -6,9 +6,10 @@
     <link rel = "stylesheet" href="/static/css/searchBar.css">
     <script src="/static/js/theme.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/theme.css" />
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Noto+Sans+JP|Pacifico|Rubik&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div class="container font-pllabel">
         <h1>Pllabel</h1>
     </div>
 
@@ -21,7 +22,8 @@
         <div class="content container2 col box center" style="float:left">
             <!--        <div id = "box1" class = "col box row content container2"  >-->
             <!--            style="float:left;">-->
-            <h3>맛집 Top 3 </h3>
+            <h3 style="margin-bottom: 0;">맛집 Top 3 </h3>
+            <div class="line">━━━━━━━━━━━━━━━━━━━━━</div>
             <table>
                 <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->    
                 <tr th:each="restaurant : ${top3_restaurant}">
@@ -33,8 +35,8 @@
         <div class="content container2 col box center" style="float:left">
             <!--        <div id = "box2" class = "col box row content container2">-->
             <!--            style="float:left;">-->
-            <h3>핫 플레이스 Top 3 </h3>
-
+            <h3 style="margin-bottom: 0;">핫 플레이스 Top 3 </h3>
+            <div class="line">━━━━━━━━━━━━━━━━━━━━━</div>
             <table>
                 <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
                 <tr th:each="place : ${top3_place}">
@@ -46,7 +48,8 @@
         <div class="content container2 col box center" style="float:left">
             <!--        <div id = "box3" class = "col box row content container2" >-->
             <!--            style="float:left">-->
-            <h3>실시간 랭킹 Top 3</h3>
+            <h3 style="margin-bottom: 0;">실시간 랭킹 Top 3</h3>
+            <div class="line">━━━━━━━━━━━━━━━━━━━━━</div>
             <table>
                 <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
                 <tr th:each="station : ${top3_station}">
