@@ -1,94 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-        <meta charset="UTF-8">      
-        <title>Place and your Life Ballence</title>
-        <link rel = "stylesheet" href="/static/css/searchBar.css">
-        <script src="/static/js/theme.js"></script>
-        <link rel="stylesheet" type="text/css" href="/static/css/theme.css" />
-
+    <meta charset="UTF-8">      
+    <title>Place and your Life Ballence</title>
+    <link rel = "stylesheet" href="/static/css/searchBar.css">
+    <script src="/static/js/theme.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/theme.css" />
 </head>
 <body>
+    <div class="container">
+        <h1>Pllabel</h1>
+    </div>
 
-        <div class="container">
-            <h1>Pllabel</h1>
-        </div>
+    <form action="/" method = "POST" id = "stationSearch" class="search-container" style="margin-top: 75px; margin-right: 500px;">
+        <input ype="text" name = "station" value="" id="search-bar" placeholder="지역, 지하철 역을 입력하세요">
+        <a href="#"><img class="search-icon" input type="submit" src="http://www.endlessicons.com/wp-content/uploads/2012/12/search-icon.png"></a>
+    </form>
 
-
-       <form action="/" method = "POST" id = "stationSearch" class="search-container">
-            <input ype="text" name = "station" value="" id="search-bar" placeholder="지역, 지하철 역을 입력하세요">
-            <a href="#"><img class="search-icon" input type="submit" src="http://www.endlessicons.com/wp-content/uploads/2012/12/search-icon.png"></a>
-        </form>
-
-
+    <div class="ranking-section">
         <div class="content container2 col box center" style="float:left">
-<!--        <div id = "box1" class = "col box row content container2"  >-->
-<!--            style="float:left;">-->
-        <h4>맛집 Top 3 </h4>
+            <!--        <div id = "box1" class = "col box row content container2"  >-->
+            <!--            style="float:left;">-->
+            <h3>맛집 Top 3 </h3>
             <table>
-                    <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->
-                    <tr th:each="restaurant : ${top3_restaurant}">
-                        <td th:text="${restaurant}">restaurant</td>
-                    </tr>
+                <!--/*@thymesVar id="top3_restaurant" type="org.webapp.controller.PageController"*/-->    
+                <tr th:each="restaurant : ${top3_restaurant}">
+                    <td th:text="${restaurant}">restaurant</td>
+                </tr>
             </table>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </div>
 
         <div class="content container2 col box center" style="float:left">
-<!--        <div id = "box2" class = "col box row content container2">-->
-<!--            style="float:left;">-->
-            <h4>핫 플레이스 Top 3 </h4>
+            <!--        <div id = "box2" class = "col box row content container2">-->
+            <!--            style="float:left;">-->
+            <h3>핫 플레이스 Top 3 </h3>
 
             <table>
-                    <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
-                    <tr th:each="place : ${top3_place}">
-                        <td th:text="${place}">place</td>
-                    </tr>
+                <!--/*@thymesVar id="top3_place" type="org.webapp.controller.PageController"*/-->
+                <tr th:each="place : ${top3_place}">
+                    <td th:text="${place}">place</td>
+                </tr>
             </table>
-
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur.
         </div>
 
         <div class="content container2 col box center" style="float:left">
-<!--        <div id = "box3" class = "col box row content container2" >-->
-<!--            style="float:left">-->
-        <h4>실시간 랭킹 Top 3</h4>
+            <!--        <div id = "box3" class = "col box row content container2" >-->
+            <!--            style="float:left">-->
+            <h3>실시간 랭킹 Top 3</h3>
             <table>
-                    <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
-                    <tr th:each="station : ${top3_station}">
-                        <td th:text="${station}">station</td>
-                    </tr>
+                <!--/*@thymesVar id="top3_station" type="org.webapp.controller.PageController"*/-->
+                <tr th:each="station : ${top3_station}">
+                    <td th:text="${station}">station</td>
+                </tr>
             </table>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non.
         </div>
+    </div>
 
-        <div style="position: absolute; left: 400px; top: 700px;">
-
+    <div style="position: absolute; left: 400px; top: 700px;">
         <div id="footer" ;class="container">
             Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
         </div>
 
-        <div class="container">
+        <div class="container3">
             <button onClick="userTheme(true);">Theme Change</button>
         </div>
 
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-
+    </div>
 </body>
 </html>
 
