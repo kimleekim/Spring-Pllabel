@@ -56,13 +56,17 @@ public class MappingTop10RestaurantsProcessor extends SuperMappingTopRestaurants
 
         mapForLikesAndRestaurants = selectInformationPerStation(station);
         sorted = super.mapTop30Restaurants(mapForLikesAndRestaurants);
+        System.out.println(station);
+        System.out.println("원래 메소드 결과 : " + mapForLikesAndRestaurants);
+        System.out.println("&&&&&&&&  " + sorted);
 
-        if(sorted.size() > 10) {
-            top10 = sorted.subList(0, 10);
+        if(sorted.size() > 13) {
+            top10 = sorted.subList(0, 13);
         }
         else {
             top10 = sorted;
         }
+        System.out.println("######자름 ####  " + top10);
 
         return Collections.singletonMap(station, top10);
     }
