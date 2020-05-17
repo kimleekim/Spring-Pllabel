@@ -10,7 +10,11 @@ Our Project Pllabel! : Spring framework-mvc: 5.1.8, Gradle, Mysql, Tomcat9, jdk1
 
 
 ### DB Schema
+#### 데이터 수집
 ![db](https://user-images.githubusercontent.com/40621689/82152189-96c37980-989a-11ea-8528-06e638fb1627.PNG)
+
+#### Batch 작업
+![55](https://user-images.githubusercontent.com/40621689/82153880-2ec66080-98a5-11ea-9c78-d521f764be38.PNG)
 
 
 ### DB 내 테이블 기능
